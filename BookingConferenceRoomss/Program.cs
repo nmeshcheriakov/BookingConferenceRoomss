@@ -15,6 +15,12 @@ namespace BookingConferenceRoomss
         [STAThread]
         static void Main()
         {
+            // Указываем, что DataDirectory — это папка с программой
+            AppDomain.CurrentDomain.SetData("DataDirectory", Application.StartupPath);
+
+            // Автоматически создаём базу данных при первом запуске
+            DatabaseInitializer.Initialize();
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
