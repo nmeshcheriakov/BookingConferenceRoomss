@@ -28,72 +28,61 @@ namespace BookingConferenceRoomss
 
         private void reg_bt_Click(object sender, EventArgs e)
         {
-            string login = log_tb.Text.Trim();
-            string email = email_tb.Text.Trim();
-            string password = password_tb.Text.Trim();
-            string repeatPassword = repeat_password_tb.Text.Trim();
-
-            if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(email) ||
-                string.IsNullOrEmpty(password) || string.IsNullOrEmpty(repeatPassword))
-            {
-                MessageBox.Show("Пожалуйста, заполните все поля!", "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            if (password != repeatPassword)
-            {
-                MessageBox.Show("Пароли не совпадают!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
                 {
                     connection.Open();
 
-                    // Шаг А: Проверяем, не занят ли уже такой логин или E-mail
-                    string checkQuery = "SELECT COUNT(*) FROM [User] WHERE [Login] = @login OR [Email] = @email";
+                    // Шаг А: Проверяем, не занят ли логин
+                    string checkQuery = "SELECT COUNT(*) FROM [User] WHERE [Login] = @login";
                     using (SqlCommand checkCmd = new SqlCommand(checkQuery, connection))
                     {
-                        checkCmd.Parameters.AddWithValue("@login", login);
-                        checkCmd.Parameters.AddWithValue("@email", email);
-
+                        checkCmd.Parameters.AddWithValue("@login", log_tb.Text.Trim());
                         int userExists = Convert.ToInt32(checkCmd.ExecuteScalar());
 
                         if (userExists > 0)
                         {
-                            MessageBox.Show("Пользователь с таким логином или E-mail уже существует!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return; // Прерываем регистрацию
+                            MessageBox.Show("Пользователь с таким логином уже существует!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
                         }
                     }
 
-                    // Шаг Б: Если всё ок, добавляем нового пользователя
-                    // По умолчанию ставим RoleId = 2 (обычный пользователь)
-                    string insertQuery = "INSERT INTO [User] ([Login], [Password], [Email], [RoleId]) VALUES (@login, @password, @email, 2)";
+                    // === ШАГ Б: ВЫЧИСЛЯЕМ СЛЕДУЮЩИЙ СВОБОДНЫЙ ID (Исправление ошибки) ===
+                    int nextId = 1;
+                    string idQuery = "SELECT ISNULL(MAX(Id), 0) + 1 FROM [User]";
+                    using (SqlCommand idCmd = new SqlCommand(idQuery, connection))
+                    {
+                        nextId = Convert.ToInt32(idCmd.ExecuteScalar());
+                    }
+                    // =================================================================
 
+                    // Шаг В: Вставляем данные. Обрати внимание, теперь [Id] и [email] на своих местах!
+                    string insertQuery = "INSERT INTO [User] ([Id], [Login], [email], [Password], [RoleId]) VALUES (@id, @login, @email, @password, 2)";
                     using (SqlCommand insertCmd = new SqlCommand(insertQuery, connection))
                     {
-                        insertCmd.Parameters.AddWithValue("@login", login);
-                        insertCmd.Parameters.AddWithValue("@password", password);
-                        insertCmd.Parameters.AddWithValue("@email", email);
+                        insertCmd.Parameters.AddWithValue("@id", nextId); // Передаем вычисленный ID
+                        insertCmd.Parameters.AddWithValue("@login", log_tb.Text.Trim());
+                        insertCmd.Parameters.AddWithValue("@email", email_tb.Text.Trim()); // Если на форме нет поля Email, генерируем временный заглушечный адрес
+                        insertCmd.Parameters.AddWithValue("@password", password_tb.Text.Trim());
 
-                        // ExecuteNonQuery используется для команд INSERT, UPDATE, DELETE
                         insertCmd.ExecuteNonQuery();
                     }
 
-                    // Шаг В: Уведомляем об успехе и возвращаем на форму авторизации
                     MessageBox.Show("Регистрация успешно завершена!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                    // Открываем первую форму (авторизацию) обратно
+                    // Возвращаемся на форму входа
                     Form1 loginForm = new Form1();
                     loginForm.Show();
-                    this.Close(); // Закрываем форму регистрации насовсем (освобождаем память)
+                    this.Close();
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Ошибка при работе с базой данных: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
             }
+
+        
         }
 
         private void RegistrationForm_FormClosed(object sender, FormClosedEventArgs e)

@@ -52,8 +52,8 @@ namespace BookingConferenceRoomss
 
                     using (SqlCommand cmd = new SqlCommand(loginQuery, connection))
                     {
-                        cmd.Parameters.AddWithValue("@login", login);
-                        cmd.Parameters.AddWithValue("@password", password);
+                        cmd.Parameters.AddWithValue("@login", log_tb.Text.Trim());
+                        cmd.Parameters.AddWithValue("@password", password_tb.Text.Trim());
 
                         // Выполняем запрос. ExecuteScalar возвращает одно конкретное значение (первую колонку первой строки)
                         object result = cmd.ExecuteScalar();
@@ -65,18 +65,20 @@ namespace BookingConferenceRoomss
                             if (roleId == 1)
                             {
                                 MessageBox.Show("Добро пожаловать, Администратор!", "Вход успешен", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                // Тут в будущем откроем форму админа:
-                                // AdminForm adminForm = new AdminForm();
-                                // adminForm.Show();
-                                // this.Hide();
+
+                                AdminForm adminForm = new AdminForm();
+                                adminForm.Show();
+                                this.Hide();
                             }
                             else if (roleId == 2)
                             {
-                                MessageBox.Show("Добро пожаловать, Пользователь!", "Вход успешен", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                // Тут в будущем откроем форму обычного юзера:
-                                // UserForm userForm = new UserForm();
-                                // userForm.Show();
-                                // this.Hide();
+                                MessageBox.Show("Добро пожаловать!", "Вход успешен", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                                MainFrom userForm = new MainFrom();
+                                userForm.FormClosed += (s, args) => this.Close(); 
+                                userForm.Show();
+                                this.Hide();
+
                             }
                         }
                         else // Если result == null, значит, такого логина/пароля нет в базе

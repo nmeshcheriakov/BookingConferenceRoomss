@@ -63,6 +63,7 @@
             this.password_tb.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.password_tb.Location = new System.Drawing.Point(253, 277);
             this.password_tb.Name = "password_tb";
+            this.password_tb.PasswordChar = '*';
             this.password_tb.Size = new System.Drawing.Size(269, 32);
             this.password_tb.TabIndex = 2;
             // 
@@ -130,6 +131,7 @@
             this.repeat_password_tb.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.repeat_password_tb.Location = new System.Drawing.Point(253, 350);
             this.repeat_password_tb.Name = "repeat_password_tb";
+            this.repeat_password_tb.PasswordChar = '*';
             this.repeat_password_tb.Size = new System.Drawing.Size(269, 32);
             this.repeat_password_tb.TabIndex = 9;
             // 
