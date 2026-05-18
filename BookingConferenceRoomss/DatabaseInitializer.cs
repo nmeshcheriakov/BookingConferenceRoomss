@@ -64,8 +64,9 @@ namespace BookingConferenceRooms
                     @"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='User' AND xtype='U')
                     CREATE TABLE [dbo].[User] (
                         [Id] INT NOT NULL PRIMARY KEY,
-                        [Login] NVARCHAR(50) NULL,
-                        [Password] NVARCHAR(50) NULL,
+                        [Login] NVARCHAR(50)  NOT NULL,
+                        [email] NVARCHAR(50) NOT NULL,
+                        [Password] NVARCHAR(50) NOT NULL,
                         [RoleId] INT NULL,
                         CONSTRAINT [FK_User_Role] FOREIGN KEY ([RoleId]) REFERENCES [dbo].[Role]([Id])
                     );",
