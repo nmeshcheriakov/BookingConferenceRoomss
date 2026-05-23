@@ -34,12 +34,25 @@ namespace BookingConferenceRoomss
                 {
                     connection.Open();
 
-                    // Шаг А: Проверяем, не занят ли логин
+                   
                     string checkQuery = "SELECT COUNT(*) FROM [User] WHERE [Login] = @login";
                     using (SqlCommand checkCmd = new SqlCommand(checkQuery, connection))
                     {
                         checkCmd.Parameters.AddWithValue("@login", log_tb.Text.Trim());
                         int userExists = Convert.ToInt32(checkCmd.ExecuteScalar());
+
+                        if (log_tb.Text == "" || email_tb.Text == "" || 
+                            password_tb.Text == "" || repeat_password_tb.Text == "")
+                        {
+                            MessageBox.Show("Все поля должны быть заполнены", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        if (repeat_password_tb.Text != password_tb.Text)
+                        {
+                            MessageBox.Show("Пароли должны совпадать", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
 
                         if (userExists > 0)
                         {
@@ -48,16 +61,14 @@ namespace BookingConferenceRoomss
                         }
                     }
 
-                    // === ШАГ Б: ВЫЧИСЛЯЕМ СЛЕДУЮЩИЙ СВОБОДНЫЙ ID (Исправление ошибки) ===
+                    
                     int nextId = 1;
                     string idQuery = "SELECT ISNULL(MAX(Id), 0) + 1 FROM [User]";
                     using (SqlCommand idCmd = new SqlCommand(idQuery, connection))
                     {
                         nextId = Convert.ToInt32(idCmd.ExecuteScalar());
                     }
-                    // =================================================================
-
-                    // Шаг В: Вставляем данные. Обрати внимание, теперь [Id] и [email] на своих местах!
+                    
                     string insertQuery = "INSERT INTO [User] ([Id], [Login], [email], [Password], [RoleId]) VALUES (@id, @login, @email, @password, 2)";
                     using (SqlCommand insertCmd = new SqlCommand(insertQuery, connection))
                     {
@@ -71,7 +82,7 @@ namespace BookingConferenceRoomss
 
                     MessageBox.Show("Регистрация успешно завершена!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                    // Возвращаемся на форму входа
+                    
                     Form1 loginForm = new Form1();
                     loginForm.Show();
                     this.Close();
@@ -92,6 +103,14 @@ namespace BookingConferenceRoomss
                 Form1 loginForm = new Form1();
                 loginForm.Show();
             }
+        }
+
+        private void back_bt_Click(object sender, EventArgs e)
+        {
+            Form1 loginform = new Form1();
+            loginform.Show();
+            this.Close();
+
         }
     }
 }

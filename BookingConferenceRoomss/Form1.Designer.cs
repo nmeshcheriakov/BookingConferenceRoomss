@@ -1,4 +1,6 @@
-﻿namespace BookingConferenceRoomss
+﻿using System;
+
+namespace BookingConferenceRoomss
 {
     partial class Form1
     {
@@ -19,6 +21,7 @@
             }
             base.Dispose(disposing);
         }
+        
 
         #region Код, автоматически созданный конструктором форм Windows
 
@@ -113,7 +116,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.DarkSalmon;
+            this.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.ClientSize = new System.Drawing.Size(792, 450);
             this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.entrance_bt);

@@ -47,7 +47,7 @@ namespace BookingConferenceRoomss
                 {
                     connection.Open();
 
-                    // SQL-запрос: ищем пользователя с таким логином и паролем и берем его RoleId
+                    
                     string loginQuery = "SELECT RoleId FROM [User] WHERE [Login] = @login AND [Password] = @password";
 
                     using (SqlCommand cmd = new SqlCommand(loginQuery, connection))
@@ -55,10 +55,10 @@ namespace BookingConferenceRoomss
                         cmd.Parameters.AddWithValue("@login", log_tb.Text.Trim());
                         cmd.Parameters.AddWithValue("@password", password_tb.Text.Trim());
 
-                        // Выполняем запрос. ExecuteScalar возвращает одно конкретное значение (первую колонку первой строки)
+                        
                         object result = cmd.ExecuteScalar();
 
-                        if (result != null) // Если нашли пользователя
+                        if (result != null) 
                         {
                             int roleId = Convert.ToInt32(result);
 
@@ -67,6 +67,7 @@ namespace BookingConferenceRoomss
                                 MessageBox.Show("Добро пожаловать, Администратор!", "Вход успешен", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                                 AdminForm adminForm = new AdminForm();
+                                adminForm.FormClosed += (s, args) => this.Close();
                                 adminForm.Show();
                                 this.Hide();
                             }
@@ -81,7 +82,7 @@ namespace BookingConferenceRoomss
 
                             }
                         }
-                        else // Если result == null, значит, такого логина/пароля нет в базе
+                        else 
                         {
                             MessageBox.Show("Неверный логин или пароль!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
@@ -89,7 +90,7 @@ namespace BookingConferenceRoomss
                 }
                 catch (Exception ex)
                 {
-                    // Если что-то пошло не так с самой базой (например, не создалась)
+                    
                     MessageBox.Show($"Ошибка подключения к базе данных: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
@@ -97,14 +98,11 @@ namespace BookingConferenceRoomss
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            // 1. Создаем экземпляр формы регистрации
+            
             RegistrationForm regForm = new RegistrationForm();
-
-            // 2. Показываем форму регистрации
             regForm.Show();
-
-            // 3. Прячем текущую форму авторизации (Form1), чтобы она не висела на заднем плане
             this.Hide();
         }
+        
     }
 }
