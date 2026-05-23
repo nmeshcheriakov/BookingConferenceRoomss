@@ -65,7 +65,7 @@ namespace BookingConferenceRooms
                     Execute(@"CREATE TABLE [dbo].[ConferenceRooms] ([Id] INT NOT NULL PRIMARY KEY, [Name] NVARCHAR(50) NOT NULL, [Capacity] INT NOT NULL, [description] NVARCHAR(50) NULL, [image] IMAGE NULL)", connection);
 
                 if (!TableExists(connection, "User"))
-                    Execute(@"CREATE TABLE [dbo].[User] ([Id] INT NOT NULL PRIMARY KEY, [email] NVARCHAR(50) NOT NULL, [login] NVARCHAR(50) NOT NULL, [password] NVARCHAR(50) NOT NULL, [RoleId] INT NOT NULL, CONSTRAINT [FK_User_Role] FOREIGN KEY ([Id]) REFERENCES [dbo].[Role]([Id]))", connection);
+                    Execute(@"CREATE TABLE [dbo].[User] ([Id] INT NOT NULL PRIMARY KEY, [login] NVARCHAR(50) NOT NULL, [email] NVARCHAR(50) NOT NULL, [password] NVARCHAR(50) NOT NULL, [RoleId] INT NOT NULL, CONSTRAINT [FK_User_Role] FOREIGN KEY ([RoleId]) REFERENCES [dbo].[Role]([Id]))", connection);
 
                 if (!TableExists(connection, "Booking"))
                     Execute(@"CREATE TABLE [dbo].[Booking] ([Id] INT NOT NULL PRIMARY KEY, [CheckIn] DATETIME NOT NULL, [CheckOut] DATETIME NOT NULL, [Guests] INT NOT NULL, [UserId] INT NOT NULL, [ConferenceRoomId] INT NOT NULL, [StatusId] INT NOT NULL, CONSTRAINT [FK_Booking_User] FOREIGN KEY ([UserId]) REFERENCES [dbo].[User]([Id]), CONSTRAINT [FK_Booking_ConferenceRooms] FOREIGN KEY ([ConferenceRoomId]) REFERENCES [dbo].[ConferenceRooms]([Id]), CONSTRAINT [FK_Booking_StatusBooking] FOREIGN KEY ([StatusId]) REFERENCES [dbo].[StatusBooking]([Id]))", connection);

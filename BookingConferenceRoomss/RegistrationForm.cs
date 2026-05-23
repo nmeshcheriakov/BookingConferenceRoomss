@@ -32,68 +32,73 @@ namespace BookingConferenceRoomss
             {
                 try
                 {
-                    connection.Open();
-
-                   
-                    string checkQuery = "SELECT COUNT(*) FROM [User] WHERE [Login] = @login";
-                    using (SqlCommand checkCmd = new SqlCommand(checkQuery, connection))
+                    
                     {
-                        checkCmd.Parameters.AddWithValue("@login", log_tb.Text.Trim());
-                        int userExists = Convert.ToInt32(checkCmd.ExecuteScalar());
+                        connection.Open();
 
-                        if (log_tb.Text == "" || email_tb.Text == "" || 
-                            password_tb.Text == "" || repeat_password_tb.Text == "")
+                        // Проверка существования логина
+                        string checkQuery = "SELECT COUNT(*) FROM [User] WHERE [login] = @login";
+                        using (SqlCommand checkCmd = new SqlCommand(checkQuery, connection))
                         {
-                            MessageBox.Show("Все поля должны быть заполнены", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
+                            checkCmd.Parameters.AddWithValue("@login", log_tb.Text.Trim());
+                            int userExists = (int)checkCmd.ExecuteScalar();
+
+                            if (userExists > 0)
+                            {
+                                MessageBox.Show("Пользователь с таким логином уже существует!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
                         }
 
-                        if (repeat_password_tb.Text != password_tb.Text)
+                        // Получаем следующий Id
+                        int nextId;
+                        string idQuery = "SELECT ISNULL(MAX(Id), 0) + 1 FROM [User]";
+                        using (SqlCommand idCmd = new SqlCommand(idQuery, connection))
                         {
-                            MessageBox.Show("Пароли должны совпадать", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
+                            nextId = (int)idCmd.ExecuteScalar();
                         }
 
-                        if (userExists > 0)
+                        // Вставляем пользователя
+                        string insertQuery = "INSERT INTO [User] ([Id], [login], [email], [password], [RoleId]) VALUES (@id, @login, @email, @password, 2)";
+                        using (SqlCommand insertCmd = new SqlCommand(insertQuery, connection))
                         {
-                            MessageBox.Show("Пользователь с таким логином уже существует!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
+                            insertCmd.Parameters.AddWithValue("@id", nextId);
+                            insertCmd.Parameters.AddWithValue("@login", log_tb.Text.Trim()); // Используем логин как ФИО, если нет поля ФИО
+                            insertCmd.Parameters.AddWithValue("@email", log_tb.Text.Trim());
+                            insertCmd.Parameters.AddWithValue("@password", password_tb.Text.Trim());
+                            insertCmd.ExecuteNonQuery();
                         }
-                    }
 
-                    
-                    int nextId = 1;
-                    string idQuery = "SELECT ISNULL(MAX(Id), 0) + 1 FROM [User]";
-                    using (SqlCommand idCmd = new SqlCommand(idQuery, connection))
+                        MessageBox.Show("Регистрация успешно завершена!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                        Form1 loginForm = new Form1();
+                        loginForm.Show();
+                        this.Close();
+                    }
+                }
+                catch (SqlException sqlEx)
+                {
+                    // Выводим ВСЕ ошибки SQL
+                    string allErrors = "";
+                    foreach (SqlError error in sqlEx.Errors)
                     {
-                        nextId = Convert.ToInt32(idCmd.ExecuteScalar());
+                        allErrors += $"Ошибка SQL: {error.Message}\nНомер: {error.Number}\n\n";
                     }
-                    
-                    string insertQuery = "INSERT INTO [User] ([Id], [Login], [email], [Password], [RoleId]) VALUES (@id, @login, @email, @password, 2)";
-                    using (SqlCommand insertCmd = new SqlCommand(insertQuery, connection))
-                    {
-                        insertCmd.Parameters.AddWithValue("@id", nextId); // Передаем вычисленный ID
-                        insertCmd.Parameters.AddWithValue("@login", log_tb.Text.Trim());
-                        insertCmd.Parameters.AddWithValue("@email", email_tb.Text.Trim()); // Если на форме нет поля Email, генерируем временный заглушечный адрес
-                        insertCmd.Parameters.AddWithValue("@password", password_tb.Text.Trim());
-
-                        insertCmd.ExecuteNonQuery();
-                    }
-
-                    MessageBox.Show("Регистрация успешно завершена!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    
-                    Form1 loginForm = new Form1();
-                    loginForm.Show();
-                    this.Close();
+                    MessageBox.Show(allErrors, "Ошибка SQL", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка при работе с базой данных: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    string fullError = ex.Message;
+                    Exception inner = ex.InnerException;
+                    while (inner != null)
+                    {
+                        fullError += "\n→ " + inner.Message;
+                        inner = inner.InnerException;
+                    }
+                    MessageBox.Show(fullError, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
 
-        
         }
 
         private void RegistrationForm_FormClosed(object sender, FormClosedEventArgs e)
