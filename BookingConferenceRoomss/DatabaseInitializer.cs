@@ -68,84 +68,102 @@ namespace BookingConferenceRooms
             {
                 connection.Open();
 
-                string[] createTableCommands = new string[]
-                {
-                    // Таблица РОЛЕЙ
-                    @"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Role' AND xtype='U')
+                // 1. Role
+                string createRole = @"
+                    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Role' AND xtype='U')
                     CREATE TABLE [dbo].[Role] (
                         [Id] INT NOT NULL PRIMARY KEY,
-                        [Name] NVARCHAR(50) NOT NULL
-                    );",
+                        [name] NTEXT NOT NULL
+                    );";
+                ExecuteCommand(createRole, connection);
 
-                    // Таблица ПОЛЬЗОВАТЕЛЕЙ
-                    @"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='User' AND xtype='U')
-                    CREATE TABLE [dbo].[User] (
-                        [Id] INT NOT NULL PRIMARY KEY,
-                        [Login] NVARCHAR(50) NOT NULL,
-                        [email] NVARCHAR(50) NOT NULL,
-                        [Password] NVARCHAR(50) NOT NULL,
-                        [RoleId] INT NULL,
-                        CONSTRAINT [FK_User_Role] FOREIGN KEY ([RoleId]) REFERENCES [dbo].[Role]([Id])
-                    );",
-
-                    // Таблица СТАТУСОВ БРОНИРОВАНИЯ
-                    @"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='StatusBooking' AND xtype='U')
+                // 2. StatusBooking
+                string createStatus = @"
+                    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='StatusBooking' AND xtype='U')
                     CREATE TABLE [dbo].[StatusBooking] (
                         [Id] INT NOT NULL PRIMARY KEY,
-                        [Name] NVARCHAR(50) NULL
-                    );",
+                        [Name] NVARCHAR(50) NOT NULL
+                    );";
+                ExecuteCommand(createStatus, connection);
 
-                    // Таблица КОНФЕРЕНЦ-ЗАЛОВ
-                    @"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ConferenceRooms' AND xtype='U')
+                // 3. ConferenceRooms
+                string createRooms = @"
+                    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ConferenceRooms' AND xtype='U')
                     CREATE TABLE [dbo].[ConferenceRooms] (
                         [Id] INT NOT NULL PRIMARY KEY,
-                        [Name] NVARCHAR(50) NULL,
-                        [Capacity] INT NULL
-                    );",
+                        [Name] NVARCHAR(50) NOT NULL,
+                        [Capacity] INT NOT NULL,
+                        [description] NCHAR(10) NULL,
+                        [image] IMAGE NULL
+                    );";
+                ExecuteCommand(createRooms, connection);
 
-                    // Таблица САМИХ БРОНИРОВАНИЙ
-                    @"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Booking' AND xtype='U')
+                // 4. User
+                string createUser = @"
+                    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='User' AND xtype='U')
+                    CREATE TABLE [dbo].[User] (
+                        [Id] INT NOT NULL PRIMARY KEY,
+                        [FIO] NTEXT NOT NULL,
+                        [login] NVARCHAR(50) NOT NULL,
+                        [password] NVARCHAR(50) NOT NULL,
+                        [RoleId] INT NULL,
+                        CONSTRAINT [FK_User_Role] FOREIGN KEY ([Id]) REFERENCES [dbo].[Role]([Id])
+                    );";
+                ExecuteCommand(createUser, connection);
+
+                // 5. Booking
+                string createBooking = @"
+                    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Booking' AND xtype='U')
                     CREATE TABLE [dbo].[Booking] (
                         [Id] INT NOT NULL PRIMARY KEY,
-                        [CheckIn] DATETIME NULL,
-                        [CheckOut] DATETIME NULL,
-                        [Guests] INT NULL,
-                        [UserId] INT NULL,
-                        [ConferenceRoomId] INT NULL,
-                        [StatusId] INT NULL,
+                        [CheckIn] DATETIME NOT NULL,
+                        [CheckOut] DATETIME NOT NULL,
+                        [Guests] INT NOT NULL,
+                        [UserId] INT NOT NULL,
+                        [ConferenceRoomId] INT NOT NULL,
+                        [StatusId] INT NOT NULL,
                         CONSTRAINT [FK_Booking_User] FOREIGN KEY ([UserId]) REFERENCES [dbo].[User]([Id]),
                         CONSTRAINT [FK_Booking_ConferenceRooms] FOREIGN KEY ([ConferenceRoomId]) REFERENCES [dbo].[ConferenceRooms]([Id]),
                         CONSTRAINT [FK_Booking_StatusBooking] FOREIGN KEY ([StatusId]) REFERENCES [dbo].[StatusBooking]([Id])
-                    );",
+                    );";
+                ExecuteCommand(createBooking, connection);
 
-                    // Заполнение ролей по умолчанию
-                    @"IF NOT EXISTS (SELECT * FROM [dbo].[Role] WHERE [Id] = 1)
-                    INSERT INTO [dbo].[Role] ([Id], [Name]) VALUES (1, 'Администратор');
+                // Заполняем начальные данные
+
+                // Роли
+                string insertRoles = @"
+                    IF NOT EXISTS (SELECT * FROM [dbo].[Role] WHERE [Id] = 1)
+                    INSERT INTO [dbo].[Role] ([Id], [name]) VALUES (1, N'Администратор');
                     IF NOT EXISTS (SELECT * FROM [dbo].[Role] WHERE [Id] = 2)
-                    INSERT INTO [dbo].[Role] ([Id], [Name]) VALUES (2, 'Пользователь');",
+                    INSERT INTO [dbo].[Role] ([Id], [name]) VALUES (2, N'Пользователь');";
+                ExecuteCommand(insertRoles, connection);
 
-                    // Заполнение статусов бронирования
-                    @"IF NOT EXISTS (SELECT * FROM [dbo].[StatusBooking] WHERE [Id] = 1)
-                    INSERT INTO [dbo].[StatusBooking] ([Id], [Name]) VALUES (1, 'Подтверждено');
+                // Статусы
+                string insertStatuses = @"
+                    IF NOT EXISTS (SELECT * FROM [dbo].[StatusBooking] WHERE [Id] = 1)
+                    INSERT INTO [dbo].[StatusBooking] ([Id], [Name]) VALUES (1, N'Подтверждено');
                     IF NOT EXISTS (SELECT * FROM [dbo].[StatusBooking] WHERE [Id] = 2)
-                    INSERT INTO [dbo].[StatusBooking] ([Id], [Name]) VALUES (2, 'Отменено');
+                    INSERT INTO [dbo].[StatusBooking] ([Id], [Name]) VALUES (2, N'Отменено');
                     IF NOT EXISTS (SELECT * FROM [dbo].[StatusBooking] WHERE [Id] = 3)
-                    INSERT INTO [dbo].[StatusBooking] ([Id], [Name]) VALUES (3, 'Завершено');",
+                    INSERT INTO [dbo].[StatusBooking] ([Id], [Name]) VALUES (3, N'Завершено');";
+                ExecuteCommand(insertStatuses, connection);
 
-                    // Добавление главного Администратора системы
-                    @"IF NOT EXISTS (SELECT * FROM [dbo].[User] WHERE [Login] = 'admin')
-                    INSERT INTO [dbo].[User] ([Id], [Login], [email], [Password], [RoleId]) 
-                    VALUES (1, 'admin', 'admin@mail.ru', 'admin', 1);"
-                };
+                // Администратор по умолчанию
+                string insertAdmin = @"
+                    IF NOT EXISTS (SELECT * FROM [dbo].[User] WHERE [login] = 'admin')
+                    INSERT INTO [dbo].[User] ([Id], [FIO], [login], [password], [RoleId]) 
+                    VALUES (1, N'Администратор', 'admin', 'admin', 1);";
+                ExecuteCommand(insertAdmin, connection);
+            }
+        }
 
-                foreach (string sql in createTableCommands)
-                {
-                    using (SqlCommand cmd = new SqlCommand(sql, connection))
-                    {
-                        cmd.ExecuteNonQuery();
-                    }
-                }
+        private static void ExecuteCommand(string sql, SqlConnection connection)
+        {
+            using (SqlCommand cmd = new SqlCommand(sql, connection))
+            {
+                cmd.ExecuteNonQuery();
             }
         }
     }
 }
+            
