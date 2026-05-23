@@ -6,164 +6,98 @@ namespace BookingConferenceRooms
 {
     public static class DatabaseInitializer
     {
-        private static readonly string ConnectionString =
-            @"Data Source=(LocalDB)\MSSQLLocalDB;" +
-            @"AttachDbFilename=|DataDirectory|\BookingConferenceRoomsDB.mdf;" +
-            @"Integrated Security=True;" +
-            @"Connect Timeout=30";
-
         public static void Initialize()
         {
             string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BookingConferenceRoomsDB.mdf");
+            string logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BookingConferenceRoomsDB_log.ldf");
 
-            // Если файл базы данных уже физически существует на диске — выходим, база на месте
-            if (File.Exists(dbPath))
-            {
-                return;
-            }
-
-            // Если файлов нет, очищаем системный кэш LocalDB через отсоединение (DETACH)
             string masterConnection = @"Data Source=(LocalDB)\MSSQLLocalDB;Integrated Security=True";
 
-            using (SqlConnection connection = new SqlConnection(masterConnection))
+            // Создаём базу данных, только если файл ещё не существует
+            if (!File.Exists(dbPath))
             {
-                try
+                using (SqlConnection connection = new SqlConnection(masterConnection))
                 {
                     connection.Open();
 
-                    // Безопасное «забывание» старой базы. Если файлов нет, этот скрипт просто выкинет имя из памяти LocalDB
-                    string detachCmdText = @"
-                        IF EXISTS (SELECT * FROM sys.databases WHERE name = 'BookingConferenceRoomsDB')
+                    // Удаляем базу из памяти сервера, если она там есть
+                    string dropDb = @"
+                        IF EXISTS (SELECT name FROM sys.databases WHERE name = 'BookingConferenceRoomsDB')
                         BEGIN
-                            ALTER DATABASE BookingConferenceRoomsDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-                            EXEC sp_detach_db 'BookingConferenceRoomsDB', 'true';
+                            ALTER DATABASE [BookingConferenceRoomsDB] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+                            DROP DATABASE [BookingConferenceRoomsDB];
                         END";
-
-                    using (SqlCommand detachCmd = new SqlCommand(detachCmdText, connection))
+                    using (SqlCommand cmd = new SqlCommand(dropDb, connection))
                     {
-                        try { detachCmd.ExecuteNonQuery(); } catch { /* Игнорируем внутренние капризы LocalDB */ }
+                        cmd.ExecuteNonQuery();
                     }
 
-                    // Теперь создаем базу абсолютно чисто
-                    string createDbCommand = $@"
-                        CREATE DATABASE BookingConferenceRoomsDB
-                        ON PRIMARY
-                        (NAME = BookingConferenceRoomsDB, FILENAME = '{dbPath}')
-                        LOG ON
-                        (NAME = BookingConferenceRoomsDB_log, FILENAME = '{Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BookingConferenceRoomsDB_log.ldf")}')";
-
-                    using (SqlCommand createCmd = new SqlCommand(createDbCommand, connection))
+                    // Создаём базу заново
+                    string createDb = $@"
+                        CREATE DATABASE [BookingConferenceRoomsDB]
+                        ON PRIMARY (NAME = N'BookingConferenceRoomsDB', FILENAME = N'{dbPath}')
+                        LOG ON (NAME = N'BookingConferenceRoomsDB_log', FILENAME = N'{logPath}')";
+                    using (SqlCommand cmd = new SqlCommand(createDb, connection))
                     {
-                        createCmd.ExecuteNonQuery();
+                        cmd.ExecuteNonQuery();
                     }
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception($"Критическая ошибка при создании базы данных в LocalDB: {ex.Message}", ex);
                 }
             }
 
-            // 3. Создаём таблицы (этот блок оставляем без изменений)
-            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            // Строка подключения к базе
+            string connectionString =
+                @"Data Source=(LocalDB)\MSSQLLocalDB;" +
+                @"AttachDbFilename=" + dbPath + ";" +
+                @"Integrated Security=True";
+
+            // Создаём таблицы
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
 
-                // 1. Role
-                string createRole = @"
-                    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Role' AND xtype='U')
-                    CREATE TABLE [dbo].[Role] (
-                        [Id] INT NOT NULL PRIMARY KEY,
-                        [name] NTEXT NOT NULL
-                    );";
-                ExecuteCommand(createRole, connection);
+                if (!TableExists(connection, "Role"))
+                    Execute(@"CREATE TABLE [dbo].[Role] ([Id] INT NOT NULL PRIMARY KEY, [name] NVARCHAR(50) NOT NULL)", connection);
 
-                // 2. StatusBooking
-                string createStatus = @"
-                    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='StatusBooking' AND xtype='U')
-                    CREATE TABLE [dbo].[StatusBooking] (
-                        [Id] INT NOT NULL PRIMARY KEY,
-                        [Name] NVARCHAR(50) NOT NULL
-                    );";
-                ExecuteCommand(createStatus, connection);
+                if (!TableExists(connection, "StatusBooking"))
+                    Execute(@"CREATE TABLE [dbo].[StatusBooking] ([Id] INT NOT NULL PRIMARY KEY, [Name] NVARCHAR(50) NOT NULL)", connection);
 
-                // 3. ConferenceRooms
-                string createRooms = @"
-                    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ConferenceRooms' AND xtype='U')
-                    CREATE TABLE [dbo].[ConferenceRooms] (
-                        [Id] INT NOT NULL PRIMARY KEY,
-                        [Name] NVARCHAR(50) NOT NULL,
-                        [Capacity] INT NOT NULL,
-                        [description] NCHAR(10) NULL,
-                        [image] IMAGE NULL
-                    );";
-                ExecuteCommand(createRooms, connection);
+                if (!TableExists(connection, "ConferenceRooms"))
+                    Execute(@"CREATE TABLE [dbo].[ConferenceRooms] ([Id] INT NOT NULL PRIMARY KEY, [Name] NVARCHAR(50) NOT NULL, [Capacity] INT NOT NULL, [description] NVARCHAR(50) NULL, [image] IMAGE NULL)", connection);
 
-                // 4. User
-                string createUser = @"
-                    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='User' AND xtype='U')
-                    CREATE TABLE [dbo].[User] (
-                        [Id] INT NOT NULL PRIMARY KEY,
-                        [FIO] NTEXT NOT NULL,
-                        [login] NVARCHAR(50) NOT NULL,
-                        [password] NVARCHAR(50) NOT NULL,
-                        [RoleId] INT NULL,
-                        CONSTRAINT [FK_User_Role] FOREIGN KEY ([Id]) REFERENCES [dbo].[Role]([Id])
-                    );";
-                ExecuteCommand(createUser, connection);
+                if (!TableExists(connection, "User"))
+                    Execute(@"CREATE TABLE [dbo].[User] ([Id] INT NOT NULL PRIMARY KEY, [email] NVARCHAR(50) NOT NULL, [login] NVARCHAR(50) NOT NULL, [password] NVARCHAR(50) NOT NULL, [RoleId] INT NOT NULL, CONSTRAINT [FK_User_Role] FOREIGN KEY ([Id]) REFERENCES [dbo].[Role]([Id]))", connection);
 
-                // 5. Booking
-                string createBooking = @"
-                    IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Booking' AND xtype='U')
-                    CREATE TABLE [dbo].[Booking] (
-                        [Id] INT NOT NULL PRIMARY KEY,
-                        [CheckIn] DATETIME NOT NULL,
-                        [CheckOut] DATETIME NOT NULL,
-                        [Guests] INT NOT NULL,
-                        [UserId] INT NOT NULL,
-                        [ConferenceRoomId] INT NOT NULL,
-                        [StatusId] INT NOT NULL,
-                        CONSTRAINT [FK_Booking_User] FOREIGN KEY ([UserId]) REFERENCES [dbo].[User]([Id]),
-                        CONSTRAINT [FK_Booking_ConferenceRooms] FOREIGN KEY ([ConferenceRoomId]) REFERENCES [dbo].[ConferenceRooms]([Id]),
-                        CONSTRAINT [FK_Booking_StatusBooking] FOREIGN KEY ([StatusId]) REFERENCES [dbo].[StatusBooking]([Id])
-                    );";
-                ExecuteCommand(createBooking, connection);
+                if (!TableExists(connection, "Booking"))
+                    Execute(@"CREATE TABLE [dbo].[Booking] ([Id] INT NOT NULL PRIMARY KEY, [CheckIn] DATETIME NOT NULL, [CheckOut] DATETIME NOT NULL, [Guests] INT NOT NULL, [UserId] INT NOT NULL, [ConferenceRoomId] INT NOT NULL, [StatusId] INT NOT NULL, CONSTRAINT [FK_Booking_User] FOREIGN KEY ([UserId]) REFERENCES [dbo].[User]([Id]), CONSTRAINT [FK_Booking_ConferenceRooms] FOREIGN KEY ([ConferenceRoomId]) REFERENCES [dbo].[ConferenceRooms]([Id]), CONSTRAINT [FK_Booking_StatusBooking] FOREIGN KEY ([StatusId]) REFERENCES [dbo].[StatusBooking]([Id]))", connection);
 
-                // Заполняем начальные данные
-
-                // Роли
-                string insertRoles = @"
-                    IF NOT EXISTS (SELECT * FROM [dbo].[Role] WHERE [Id] = 1)
-                    INSERT INTO [dbo].[Role] ([Id], [name]) VALUES (1, N'Администратор');
-                    IF NOT EXISTS (SELECT * FROM [dbo].[Role] WHERE [Id] = 2)
-                    INSERT INTO [dbo].[Role] ([Id], [name]) VALUES (2, N'Пользователь');";
-                ExecuteCommand(insertRoles, connection);
-
-                // Статусы
-                string insertStatuses = @"
-                    IF NOT EXISTS (SELECT * FROM [dbo].[StatusBooking] WHERE [Id] = 1)
-                    INSERT INTO [dbo].[StatusBooking] ([Id], [Name]) VALUES (1, N'Подтверждено');
-                    IF NOT EXISTS (SELECT * FROM [dbo].[StatusBooking] WHERE [Id] = 2)
-                    INSERT INTO [dbo].[StatusBooking] ([Id], [Name]) VALUES (2, N'Отменено');
-                    IF NOT EXISTS (SELECT * FROM [dbo].[StatusBooking] WHERE [Id] = 3)
-                    INSERT INTO [dbo].[StatusBooking] ([Id], [Name]) VALUES (3, N'Завершено');";
-                ExecuteCommand(insertStatuses, connection);
-
-                // Администратор по умолчанию
-                string insertAdmin = @"
-                    IF NOT EXISTS (SELECT * FROM [dbo].[User] WHERE [login] = 'admin')
-                    INSERT INTO [dbo].[User] ([Id], [FIO], [login], [password], [RoleId]) 
-                    VALUES (1, N'Администратор', 'admin', 'admin', 1);";
-                ExecuteCommand(insertAdmin, connection);
+                // Начальные данные
+                TryExecute(@"IF NOT EXISTS (SELECT * FROM [Role] WHERE [Id] = 1) INSERT INTO [Role] ([Id], [name]) VALUES (1, N'Администратор')", connection);
+                TryExecute(@"IF NOT EXISTS (SELECT * FROM [Role] WHERE [Id] = 2) INSERT INTO [Role] ([Id], [name]) VALUES (2, N'Пользователь')", connection);
+                TryExecute(@"IF NOT EXISTS (SELECT * FROM [StatusBooking] WHERE [Id] = 1) INSERT INTO [StatusBooking] ([Id], [Name]) VALUES (1, N'Подтверждено')", connection);
+                TryExecute(@"IF NOT EXISTS (SELECT * FROM [StatusBooking] WHERE [Id] = 2) INSERT INTO [StatusBooking] ([Id], [Name]) VALUES (2, N'Отменено')", connection);
+                TryExecute(@"IF NOT EXISTS (SELECT * FROM [StatusBooking] WHERE [Id] = 3) INSERT INTO [StatusBooking] ([Id], [Name]) VALUES (3, N'Завершено')", connection);
+                TryExecute(@"IF NOT EXISTS (SELECT * FROM [User] WHERE [login] = 'admin') INSERT INTO [User] ([Id], [email], [login], [password], [RoleId]) VALUES (1, N'Администратор', 'admin', 'admin', 1)", connection);
             }
         }
 
-        private static void ExecuteCommand(string sql, SqlConnection connection)
+        private static bool TableExists(SqlConnection connection, string tableName)
         {
+            string sql = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = @name";
             using (SqlCommand cmd = new SqlCommand(sql, connection))
             {
-                cmd.ExecuteNonQuery();
+                cmd.Parameters.AddWithValue("@name", tableName);
+                return (int)cmd.ExecuteScalar() > 0;
             }
+        }
+
+        private static void Execute(string sql, SqlConnection connection)
+        {
+            new SqlCommand(sql, connection).ExecuteNonQuery();
+        }
+
+        private static void TryExecute(string sql, SqlConnection connection)
+        {
+            try { new SqlCommand(sql, connection).ExecuteNonQuery(); } catch { }
         }
     }
 }
-            
