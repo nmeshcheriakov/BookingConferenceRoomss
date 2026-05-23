@@ -38,7 +38,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.repeat_password_tb = new System.Windows.Forms.TextBox();
-            this.back_bt = new System.Windows.Forms.Button();
+            this.Back_bt = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -136,15 +136,16 @@
             this.repeat_password_tb.Size = new System.Drawing.Size(269, 32);
             this.repeat_password_tb.TabIndex = 9;
             // 
-            // back_bt
+            // Back_bt
             // 
-            this.back_bt.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.back_bt.Location = new System.Drawing.Point(64, 397);
-            this.back_bt.Name = "back_bt";
-            this.back_bt.Size = new System.Drawing.Size(71, 29);
-            this.back_bt.TabIndex = 10;
-            this.back_bt.Text = "Назад";
-            this.back_bt.UseVisualStyleBackColor = true;
+            this.Back_bt.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.Back_bt.Location = new System.Drawing.Point(64, 397);
+            this.Back_bt.Name = "Back_bt";
+            this.Back_bt.Size = new System.Drawing.Size(71, 29);
+            this.Back_bt.TabIndex = 10;
+            this.Back_bt.Text = "Назад";
+            this.Back_bt.UseVisualStyleBackColor = true;
+            this.Back_bt.Click += new System.EventHandler(this.Back_bt_Click);
             // 
             // RegistrationForm
             // 
@@ -152,7 +153,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.back_bt);
+            this.Controls.Add(this.Back_bt);
             this.Controls.Add(this.repeat_password_tb);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
@@ -184,6 +185,6 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox repeat_password_tb;
-        private System.Windows.Forms.Button back_bt;
+        private System.Windows.Forms.Button Back_bt;
     }
 }

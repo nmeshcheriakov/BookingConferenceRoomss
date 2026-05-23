@@ -105,12 +105,11 @@ namespace BookingConferenceRoomss
             }
         }
 
-        private void back_bt_Click(object sender, EventArgs e)
+        private void Back_bt_Click(object sender, EventArgs e)
         {
-            Form1 loginform = new Form1();
-            loginform.Show();
+            Form1 loginForm = new Form1();
+            loginForm.Show();
             this.Close();
-
         }
     }
 }

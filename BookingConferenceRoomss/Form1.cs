@@ -65,10 +65,9 @@ namespace BookingConferenceRoomss
                             if (roleId == 1)
                             {
                                 MessageBox.Show("Добро пожаловать, Администратор!", "Вход успешен", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                                AdminForm adminForm = new AdminForm();
-                                adminForm.FormClosed += (s, args) => this.Close();
-                                adminForm.Show();
+                                AdminMenuForm adminmenuForm = new AdminMenuForm();
+                                
+                                adminmenuForm.ShowDialog();
                                 this.Hide();
                             }
                             else if (roleId == 2)

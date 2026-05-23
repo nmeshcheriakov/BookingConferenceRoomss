@@ -1,9 +1,9 @@
-﻿CREATE TABLE [dbo].[ConferenceRooms]
-(
-	[Id] INT NOT NULL PRIMARY KEY, 
-    [name] NTEXT NOT NULL, 
-    [capacity] INT NOT NULL, 
-    [price] MONEY NOT NULL, 
-    [description] NVARCHAR(50) NULL, 
-    [photo] IMAGE NULL
-)
+﻿CREATE TABLE [dbo].[ConferenceRooms] (
+    [Id]       INT           NOT NULL,
+    [Name]     NVARCHAR (50) NOT NULL,
+    [Capacity] INT           NOT NULL,
+    [description] NCHAR(10) NULL, 
+    [image] IMAGE NULL, 
+    PRIMARY KEY CLUSTERED ([Id] ASC)
+);
+

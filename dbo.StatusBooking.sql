@@ -1,5 +1,6 @@
-﻿CREATE TABLE [dbo].[StatusBooking]
-(
-	[Id] INT NOT NULL PRIMARY KEY, 
-    [name] NTEXT NOT NULL
-)
+﻿CREATE TABLE [dbo].[StatusBooking] (
+    [Id]   INT           NOT NULL,
+    [Name] NVARCHAR (50) NOT NULL,
+    PRIMARY KEY CLUSTERED ([Id] ASC)
+);
+
