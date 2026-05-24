@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,9 +15,144 @@ namespace BookingConferenceRoomss
 {
     public partial class MainFrom : Form
     {
+        private string connectionString = ConfigurationManager.ConnectionStrings["BookingDB"].ConnectionString;
+
+
+
+        public int CurrentUserId { get; set; }
+
         public MainFrom()
         {
+
             InitializeComponent();
+        }
+
+        private void groupBox1_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void MainFrom_Load(object sender, EventArgs e)
+        {
+            start.Format = DateTimePickerFormat.Custom;
+            start.CustomFormat = "dd.MM.yyyy HH:mm";
+
+            finish.Format = DateTimePickerFormat.Custom;
+            finish.CustomFormat = "dd.MM.yyyy HH:mm";
+
+            // Устанавливаем дефолтное время: текущее и +2 часа на встречу
+            start.Value = DateTime.Now;
+            finish.Value = DateTime.Now.AddHours(2);
+
+            // Настройка счетчика гостей
+            guest.Minimum = 1;
+            guest.Value = 1;
+
+            // Сразу отображаем залы при открытии формы
+            LoadAvailableRooms();
+
+        }
+        private void show_bt_Click(object sender, EventArgs e)
+        {
+            LoadAvailableRooms();
+        }
+        private void LoadAvailableRooms()
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+
+                    // Выбираем только те залы, вместимость которых больше или равна числу гостей
+                    string query = @"SELECT [Id] as 'Номер зала', 
+                                            [Name] as 'Название зала', 
+                                            [Capacity] as 'Вместимость (чел.)', 
+                                            [description] as 'Описание' 
+                                     FROM [ConferenceRooms] 
+                                     WHERE [Capacity] >= @guests";
+
+                    // Если в строке поиска что-то написано — добавляем условие LIKE
+                    if (!string.IsNullOrWhiteSpace(search_tb.Text))
+                    {
+                        query += " AND [Name] LIKE @search";
+                    }
+
+                    using (SqlCommand cmd = new SqlCommand(query, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@guests", (int)guest.Value);
+
+                        if (!string.IsNullOrWhiteSpace(search_tb.Text))
+                        {
+                            cmd.Parameters.AddWithValue("@search", "%" + search_tb.Text.Trim() + "%");
+                        }
+
+                        SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                        DataTable dt = new DataTable();
+                        adapter.Fill(dt);
+
+                        // Закидываем результат в DataGridView
+                        dgv.DataSource = dt;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка отображения залов: {ex.Message}", "Ошибка базы данных", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void bron_bt_Click(object sender, EventArgs e)
+        {
+            if (dgv.CurrentRow == null)
+            {
+                MessageBox.Show("Пожалуйста, выберите конференц-зал из списка таблицы!", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            int roomId = Convert.ToInt32(dgv.CurrentRow.Cells["Номер зала"].Value);
+            int guestsCount = (int)guest.Value;
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+
+                    // Автоматически вычисляем следующий свободный ID для таблицы Booking
+                    SqlCommand idCmd = new SqlCommand("SELECT ISNULL(MAX(Id), 0) + 1 FROM [Booking]", connection);
+                    int newBookingId = (int)idCmd.ExecuteScalar();
+
+                    // Вставляем новую запись (StatusId = 1 — 'Подтверждено')
+                    string insertQuery = @"INSERT INTO [Booking] ([Id], [CheckIn], [CheckOut], [Guests], [UserId], [ConferenceRoomId], [StatusId]) 
+                                           VALUES (@id, @checkIn, @checkOut, @guests, @userId, @roomId, 1)";
+
+                    using (SqlCommand insertCmd = new SqlCommand(insertQuery, connection))
+                    {
+                        insertCmd.Parameters.AddWithValue("@id", newBookingId);
+                        insertCmd.Parameters.AddWithValue("@checkIn", start.Value);
+                        insertCmd.Parameters.AddWithValue("@checkOut", finish.Value);
+                        insertCmd.Parameters.AddWithValue("@guests", guestsCount);
+                        insertCmd.Parameters.AddWithValue("@userId", CurrentUserId);
+                        insertCmd.Parameters.AddWithValue("@roomId", roomId);
+
+                        insertCmd.ExecuteNonQuery();
+                    }
+
+                    MessageBox.Show("Зал успешно забронирован на ваше имя!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    // Обновляем список, чтобы сбросить состояние экрана
+                    LoadAvailableRooms();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Не удалось сохранить бронирование: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
     }
 }

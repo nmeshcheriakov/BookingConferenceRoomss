@@ -15,6 +15,8 @@ namespace BookingConferenceRoomss
     public partial class RegistrationForm : Form
     {
         public string connectionString = ConfigurationManager.ConnectionStrings["BookingDB"].ConnectionString;
+
+
         public RegistrationForm()
         {
             InitializeComponent();
@@ -62,16 +64,7 @@ namespace BookingConferenceRoomss
                                 return;
                             }
                         }
-                        if (string.IsNullOrWhiteSpace(log_tb.Text) ||
-                            string.IsNullOrWhiteSpace(email_tb.Text) ||
-                            string.IsNullOrWhiteSpace(password_tb.Text) ||
-                            string.IsNullOrWhiteSpace(repeat_password_tb.Text))
-                        {
-                            MessageBox.Show("Пожалуйста, заполните все поля!", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            return; // Останавливаем выполнение кода, в базу ничего не пишется
-                        }
-
-                        // Получаем следующий Id
+                            // Получаем следующий Id
                         int nextId;
                         string idQuery = "SELECT ISNULL(MAX(Id), 0) + 1 FROM [User]";
                         using (SqlCommand idCmd = new SqlCommand(idQuery, connection))

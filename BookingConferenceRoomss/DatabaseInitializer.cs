@@ -77,6 +77,28 @@ namespace BookingConferenceRooms
                 TryExecute(@"IF NOT EXISTS (SELECT * FROM [StatusBooking] WHERE [Id] = 2) INSERT INTO [StatusBooking] ([Id], [Name]) VALUES (2, N'Отменено')", connection);
                 TryExecute(@"IF NOT EXISTS (SELECT * FROM [StatusBooking] WHERE [Id] = 3) INSERT INTO [StatusBooking] ([Id], [Name]) VALUES (3, N'Завершено')", connection);
                 TryExecute(@"IF NOT EXISTS (SELECT * FROM [User] WHERE [login] = 'admin') INSERT INTO [User] ([Id], [email], [login], [password], [RoleId]) VALUES (1, N'Администратор', 'admin', 'admin', 1)", connection);
+                // --- НАЧАЛЬНЫЕ СПРАВОЧНЫЕ ДАННЫЕ ---
+                TryExecute(@"IF NOT EXISTS (SELECT * FROM [Role] WHERE [Id] = 1) INSERT INTO [Role] ([Id], [name]) VALUES (1, N'Администратор')", connection);
+                TryExecute(@"IF NOT EXISTS (SELECT * FROM [Role] WHERE [Id] = 2) INSERT INTO [Role] ([Id], [name]) VALUES (2, N'Пользователь')", connection);
+
+                TryExecute(@"IF NOT EXISTS (SELECT * FROM [StatusBooking] WHERE [Id] = 1) INSERT INTO [StatusBooking] ([Id], [Name]) VALUES (1, N'Подтверждено')", connection);
+                TryExecute(@"IF NOT EXISTS (SELECT * FROM [StatusBooking] WHERE [Id] = 2) INSERT INTO [StatusBooking] ([Id], [Name]) VALUES (2, N'Отменено')", connection);
+                TryExecute(@"IF NOT EXISTS (SELECT * FROM [StatusBooking] WHERE [Id] = 3) INSERT INTO [StatusBooking] ([Id], [Name]) VALUES (3, N'Завершено')", connection);
+
+                TryExecute(@"IF NOT EXISTS (SELECT * FROM [User] WHERE [login] = 'admin') INSERT INTO [User] ([Id], [email], [login], [password], [RoleId]) VALUES (1, N'Администратор', 'admin', 'admin', 1)", connection);
+
+                // --- ДОБАВЛЕНИЕ ТЕСТОВЫХ КОНФЕРЕНЦ-ЗАЛОВ ---
+                TryExecute(@"IF NOT EXISTS (SELECT * FROM [ConferenceRooms] WHERE [Id] = 1) 
+                             INSERT INTO [ConferenceRooms] ([Id], [Name], [Capacity], [description]) 
+                             VALUES (1, N'Малый зал «Альфа»', 10, N'Уютный зал для небольших совещаний и переговоров.')", connection);
+
+                TryExecute(@"IF NOT EXISTS (SELECT * FROM [ConferenceRooms] WHERE [Id] = 2) 
+                             INSERT INTO [ConferenceRooms] ([Id], [Name], [Capacity], [description]) 
+                             VALUES (2, N'Большой зал «Омега»', 50, N'Просторный зал с проектором для проведения лекций.')", connection);
+
+                TryExecute(@"IF NOT EXISTS (SELECT * FROM [ConferenceRooms] WHERE [Id] = 3) 
+                             INSERT INTO [ConferenceRooms] ([Id], [Name], [Capacity], [description]) 
+                             VALUES (3, N'Президентский VIP-зал', 15, N'Зал круглого стола с премиальным оборудованием.')", connection);
             }
         }
 
