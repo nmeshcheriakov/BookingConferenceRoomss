@@ -48,6 +48,19 @@ namespace BookingConferenceRoomss
                                 MessageBox.Show("Пользователь с таким логином уже существует!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 return;
                             }
+
+                            if (log_tb.Text == "" || email_tb.Text == "" || 
+                                password_tb.Text == "" || repeat_password_tb.Text == "")
+                            {
+                                MessageBox.Show("Все поля должны быть заполнены!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+
+                            if (repeat_password_tb.Text != password_tb.Text)
+                            {
+                                MessageBox.Show("Пароли должны совпадать!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
                         }
                         if (string.IsNullOrWhiteSpace(log_tb.Text) ||
                             string.IsNullOrWhiteSpace(email_tb.Text) ||
