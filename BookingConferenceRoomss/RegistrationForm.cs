@@ -49,6 +49,14 @@ namespace BookingConferenceRoomss
                                 return;
                             }
                         }
+                        if (string.IsNullOrWhiteSpace(log_tb.Text) ||
+                            string.IsNullOrWhiteSpace(email_tb.Text) ||
+                            string.IsNullOrWhiteSpace(password_tb.Text) ||
+                            string.IsNullOrWhiteSpace(repeat_password_tb.Text))
+                        {
+                            MessageBox.Show("Пожалуйста, заполните все поля!", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return; // Останавливаем выполнение кода, в базу ничего не пишется
+                        }
 
                         // Получаем следующий Id
                         int nextId;
@@ -103,11 +111,6 @@ namespace BookingConferenceRoomss
 
         private void RegistrationForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (Application.OpenForms["Form1"] == null)
-            {
-                Form1 loginForm = new Form1();
-                loginForm.Show();
-            }
         }
 
         private void Back_bt_Click(object sender, EventArgs e)
