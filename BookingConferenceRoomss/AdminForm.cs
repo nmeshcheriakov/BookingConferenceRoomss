@@ -25,6 +25,12 @@ namespace BookingConferenceRoomss
         {
             InitializeComponent();
             LoadRooms();
+            this.FormClosed += (s, args) => Application.Exit();
+        }
+
+        private void AdminForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
         }
 
         private void AdminForm_Load(object sender, EventArgs e)
@@ -61,36 +67,46 @@ namespace BookingConferenceRoomss
 
                 dataGridView1.Columns.Clear();
 
-                
-                DataGridViewTextBoxColumn colId = new DataGridViewTextBoxColumn();
-                colId.DataPropertyName = "Id";
-                colId.HeaderText = "ID";
-                colId.Width = 50;
-                colId.ReadOnly = true;
+
+                DataGridViewTextBoxColumn colId = new DataGridViewTextBoxColumn
+                {
+                    DataPropertyName = "Id",
+                    HeaderText = "ID",
+                    Width = 50,
+                    ReadOnly = true
+                };
                 dataGridView1.Columns.Add(colId);
 
-                DataGridViewTextBoxColumn colName = new DataGridViewTextBoxColumn();
-                colName.DataPropertyName = "Name";
-                colName.HeaderText = "Название";
-                colName.Width = 120;
+                DataGridViewTextBoxColumn colName = new DataGridViewTextBoxColumn
+                {
+                    DataPropertyName = "Name",
+                    HeaderText = "Название",
+                    Width = 120
+                };
                 dataGridView1.Columns.Add(colName);
 
-                DataGridViewTextBoxColumn colCapacity = new DataGridViewTextBoxColumn();
-                colCapacity.DataPropertyName = "Capacity";
-                colCapacity.HeaderText = "Вместимость";
-                colCapacity.Width = 80;
+                DataGridViewTextBoxColumn colCapacity = new DataGridViewTextBoxColumn
+                {
+                    DataPropertyName = "Capacity",
+                    HeaderText = "Вместимость",
+                    Width = 80
+                };
                 dataGridView1.Columns.Add(colCapacity);
 
-                DataGridViewTextBoxColumn colDesc = new DataGridViewTextBoxColumn();
-                colDesc.DataPropertyName = "description";
-                colDesc.HeaderText = "Описание";
-                colDesc.Width = 150;
+                DataGridViewTextBoxColumn colDesc = new DataGridViewTextBoxColumn
+                {
+                    DataPropertyName = "description",
+                    HeaderText = "Описание",
+                    Width = 150
+                };
                 dataGridView1.Columns.Add(colDesc);
 
-                DataGridViewImageColumn colImage = new DataGridViewImageColumn();
-                colImage.HeaderText = "Фото";
-                colImage.Width = 100;
-                colImage.ImageLayout = DataGridViewImageCellLayout.Zoom;
+                DataGridViewImageColumn colImage = new DataGridViewImageColumn
+                {
+                    HeaderText = "Фото",
+                    Width = 100,
+                    ImageLayout = DataGridViewImageCellLayout.Zoom
+                };
                 dataGridView1.Columns.Add(colImage);
 
                 dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
@@ -212,8 +228,9 @@ namespace BookingConferenceRoomss
                     // Обновляем в таблице
                     using (MemoryStream ms = new MemoryStream(imageBytes))
                     {
-                        dataGridView1.Rows[rowIndex].Cells[dataGridView1.Columns.Count - 1].Value = Image.FromStream(ms);
-                        pbPreview.Image = Image.FromStream(ms);
+                        Image original = Image.FromStream(ms);
+                        dataGridView1.Rows[rowIndex].Cells[dataGridView1.Columns.Count - 1].Value = ResizeImage(original, 160, 100);
+                        
                     }
 
                     MessageBox.Show("Фото обновлено! Нажмите «Сохранить», чтобы применить изменения.",

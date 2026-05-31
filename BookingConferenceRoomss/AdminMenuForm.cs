@@ -39,7 +39,8 @@ namespace BookingConferenceRoomss
         {
             AdminForm adminForm = new AdminForm();
             adminForm.Show();
-            this.Close();
+            adminForm.FormClosed += (s, args) => this.Close();
+            this.Hide();
         }
     }
 }

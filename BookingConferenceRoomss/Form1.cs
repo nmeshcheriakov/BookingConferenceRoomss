@@ -67,7 +67,6 @@ namespace BookingConferenceRoomss
                             {
                                 MessageBox.Show("Добро пожаловать, Администратор!", "Вход успешен", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 AdminMenuForm adminmenuForm = new AdminMenuForm();
-                                
                                 adminmenuForm.ShowDialog();
                                 this.Hide();
                             }
