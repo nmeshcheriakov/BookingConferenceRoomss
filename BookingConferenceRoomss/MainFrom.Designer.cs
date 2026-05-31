@@ -29,20 +29,20 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.start = new System.Windows.Forms.DateTimePicker();
-            this.finish = new System.Windows.Forms.DateTimePicker();
             this.guest = new System.Windows.Forms.NumericUpDown();
-            this.search_tb = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.finish = new System.Windows.Forms.DateTimePicker();
+            this.start = new System.Windows.Forms.DateTimePicker();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.show_bt = new System.Windows.Forms.Button();
+            this.search_tb = new System.Windows.Forms.TextBox();
             this.bron_bt = new System.Windows.Forms.Button();
             this.dgv = new System.Windows.Forms.DataGridView();
             this.groupBox1.SuspendLayout();
-            this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.guest)).BeginInit();
+            this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgv)).BeginInit();
             this.SuspendLayout();
             // 
@@ -63,37 +63,13 @@
             this.groupBox1.Text = "Фильтр";
             this.groupBox1.Enter += new System.EventHandler(this.groupBox1_Enter);
             // 
-            // groupBox2
+            // guest
             // 
-            this.groupBox2.Controls.Add(this.show_bt);
-            this.groupBox2.Controls.Add(this.search_tb);
-            this.groupBox2.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.groupBox2.Location = new System.Drawing.Point(399, 0);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(388, 134);
-            this.groupBox2.TabIndex = 0;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Поиск";
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label1.Location = new System.Drawing.Point(6, 28);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(186, 23);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Дата и время начала";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label2.Location = new System.Drawing.Point(6, 89);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(222, 23);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "Дата и время окончания";
+            this.guest.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.guest.Location = new System.Drawing.Point(241, 54);
+            this.guest.Name = "guest";
+            this.guest.Size = new System.Drawing.Size(120, 32);
+            this.guest.TabIndex = 5;
             // 
             // label3
             // 
@@ -105,6 +81,14 @@
             this.label3.TabIndex = 2;
             this.label3.Text = "Кол-во гостей";
             // 
+            // finish
+            // 
+            this.finish.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.finish.Location = new System.Drawing.Point(6, 115);
+            this.finish.Name = "finish";
+            this.finish.Size = new System.Drawing.Size(200, 32);
+            this.finish.TabIndex = 4;
+            // 
             // start
             // 
             this.start.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
@@ -114,28 +98,38 @@
             this.start.TabIndex = 3;
             this.start.ValueChanged += new System.EventHandler(this.dateTimePicker1_ValueChanged);
             // 
-            // finish
+            // label2
             // 
-            this.finish.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.finish.Location = new System.Drawing.Point(6, 115);
-            this.finish.Name = "finish";
-            this.finish.Size = new System.Drawing.Size(200, 32);
-            this.finish.TabIndex = 4;
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label2.Location = new System.Drawing.Point(6, 89);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(222, 23);
+            this.label2.TabIndex = 1;
+            this.label2.Text = "Дата и время окончания";
             // 
-            // guest
+            // label1
             // 
-            this.guest.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.guest.Location = new System.Drawing.Point(241, 54);
-            this.guest.Name = "guest";
-            this.guest.Size = new System.Drawing.Size(120, 32);
-            this.guest.TabIndex = 5;
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label1.Location = new System.Drawing.Point(6, 28);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(186, 23);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Дата и время начала";
             // 
-            // search_tb
+            // groupBox2
             // 
-            this.search_tb.Location = new System.Drawing.Point(6, 28);
-            this.search_tb.Name = "search_tb";
-            this.search_tb.Size = new System.Drawing.Size(263, 32);
-            this.search_tb.TabIndex = 6;
+            this.groupBox2.Controls.Add(this.show_bt);
+            this.groupBox2.Controls.Add(this.search_tb);
+            this.groupBox2.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.groupBox2.Location = new System.Drawing.Point(399, 0);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(388, 134);
+            this.groupBox2.TabIndex = 0;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Поиск";
+            this.groupBox2.Enter += new System.EventHandler(this.groupBox2_Enter);
             // 
             // show_bt
             // 
@@ -147,6 +141,13 @@
             this.show_bt.Text = "Показать";
             this.show_bt.UseVisualStyleBackColor = true;
             this.show_bt.Click += new System.EventHandler(this.show_bt_Click);
+            // 
+            // search_tb
+            // 
+            this.search_tb.Location = new System.Drawing.Point(6, 28);
+            this.search_tb.Name = "search_tb";
+            this.search_tb.Size = new System.Drawing.Size(263, 32);
+            this.search_tb.TabIndex = 6;
             // 
             // bron_bt
             // 
@@ -186,9 +187,9 @@
             this.Load += new System.EventHandler(this.MainFrom_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.guest)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.guest)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgv)).EndInit();
             this.ResumeLayout(false);
 
