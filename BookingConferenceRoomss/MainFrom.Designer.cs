@@ -57,7 +57,7 @@
             this.groupBox1.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.groupBox1.Location = new System.Drawing.Point(-1, 0);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(394, 175);
+            this.groupBox1.Size = new System.Drawing.Size(394, 188);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Фильтр";
@@ -66,7 +66,7 @@
             // guest
             // 
             this.guest.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.guest.Location = new System.Drawing.Point(241, 54);
+            this.guest.Location = new System.Drawing.Point(241, 58);
             this.guest.Name = "guest";
             this.guest.Size = new System.Drawing.Size(120, 32);
             this.guest.TabIndex = 5;
@@ -75,7 +75,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label3.Location = new System.Drawing.Point(237, 28);
+            this.label3.Location = new System.Drawing.Point(237, 30);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(135, 23);
             this.label3.TabIndex = 2;
@@ -84,7 +84,7 @@
             // finish
             // 
             this.finish.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.finish.Location = new System.Drawing.Point(6, 115);
+            this.finish.Location = new System.Drawing.Point(6, 124);
             this.finish.Name = "finish";
             this.finish.Size = new System.Drawing.Size(200, 32);
             this.finish.TabIndex = 4;
@@ -92,7 +92,7 @@
             // start
             // 
             this.start.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.start.Location = new System.Drawing.Point(6, 54);
+            this.start.Location = new System.Drawing.Point(6, 58);
             this.start.Name = "start";
             this.start.Size = new System.Drawing.Size(200, 32);
             this.start.TabIndex = 3;
@@ -102,7 +102,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label2.Location = new System.Drawing.Point(6, 89);
+            this.label2.Location = new System.Drawing.Point(6, 96);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(222, 23);
             this.label2.TabIndex = 1;
@@ -112,7 +112,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label1.Location = new System.Drawing.Point(6, 28);
+            this.label1.Location = new System.Drawing.Point(6, 30);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(186, 23);
             this.label1.TabIndex = 0;
@@ -125,7 +125,7 @@
             this.groupBox2.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.groupBox2.Location = new System.Drawing.Point(399, 0);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(388, 134);
+            this.groupBox2.Size = new System.Drawing.Size(388, 144);
             this.groupBox2.TabIndex = 0;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Поиск";
@@ -134,9 +134,9 @@
             // show_bt
             // 
             this.show_bt.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.show_bt.Location = new System.Drawing.Point(256, 98);
+            this.show_bt.Location = new System.Drawing.Point(256, 106);
             this.show_bt.Name = "show_bt";
-            this.show_bt.Size = new System.Drawing.Size(126, 30);
+            this.show_bt.Size = new System.Drawing.Size(126, 32);
             this.show_bt.TabIndex = 7;
             this.show_bt.Text = "Показать";
             this.show_bt.UseVisualStyleBackColor = true;
@@ -144,7 +144,7 @@
             // 
             // search_tb
             // 
-            this.search_tb.Location = new System.Drawing.Point(6, 28);
+            this.search_tb.Location = new System.Drawing.Point(6, 30);
             this.search_tb.Name = "search_tb";
             this.search_tb.Size = new System.Drawing.Size(263, 32);
             this.search_tb.TabIndex = 6;
@@ -152,9 +152,9 @@
             // bron_bt
             // 
             this.bron_bt.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.bron_bt.Location = new System.Drawing.Point(405, 143);
+            this.bron_bt.Location = new System.Drawing.Point(405, 154);
             this.bron_bt.Name = "bron_bt";
-            this.bron_bt.Size = new System.Drawing.Size(376, 32);
+            this.bron_bt.Size = new System.Drawing.Size(376, 34);
             this.bron_bt.TabIndex = 8;
             this.bron_bt.Text = "Забронировать";
             this.bron_bt.UseVisualStyleBackColor = true;
@@ -166,22 +166,23 @@
             this.dgv.AllowUserToDeleteRows = false;
             this.dgv.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgv.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgv.Location = new System.Drawing.Point(-8, 181);
+            this.dgv.Location = new System.Drawing.Point(-8, 195);
             this.dgv.Name = "dgv";
             this.dgv.ReadOnly = true;
-            this.dgv.Size = new System.Drawing.Size(796, 268);
+            this.dgv.Size = new System.Drawing.Size(796, 289);
             this.dgv.TabIndex = 9;
             // 
             // MainFrom
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(800, 485);
             this.Controls.Add(this.dgv);
             this.Controls.Add(this.bron_bt);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
+            this.Font = new System.Drawing.Font("Times New Roman", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.Name = "MainFrom";
             this.Text = "MainFrom";
             this.Load += new System.EventHandler(this.MainFrom_Load);

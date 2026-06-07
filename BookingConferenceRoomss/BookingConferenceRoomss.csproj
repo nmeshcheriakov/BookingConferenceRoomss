@@ -85,6 +85,12 @@
     <Compile Include="AdminMenuForm.Designer.cs">
       <DependentUpon>AdminMenuForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="AdminUserForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AdminUserForm.Designer.cs">
+      <DependentUpon>AdminUserForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainFrom.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -104,6 +110,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="AdminMenuForm.resx">
       <DependentUpon>AdminMenuForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AdminUserForm.resx">
+      <DependentUpon>AdminUserForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

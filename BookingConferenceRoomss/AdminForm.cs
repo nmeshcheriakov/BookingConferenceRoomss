@@ -30,7 +30,7 @@ namespace BookingConferenceRoomss
 
         private void AdminForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Application.Exit();
+            
         }
 
         private void AdminForm_Load(object sender, EventArgs e)
@@ -103,6 +103,7 @@ namespace BookingConferenceRoomss
 
                 DataGridViewImageColumn colImage = new DataGridViewImageColumn
                 {
+                    DataPropertyName = "image",
                     HeaderText = "Фото",
                     Width = 100,
                     ImageLayout = DataGridViewImageCellLayout.Zoom

@@ -1,0 +1,238 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace BookingConferenceRoomss
+{
+    public partial class AdminUserForm : Form
+    {
+        private string connectionString = ConfigurationManager.ConnectionStrings["BookingDB"].ConnectionString;
+
+        private DataTable userTable;
+        public AdminUserForm()
+        {
+            InitializeComponent();
+            LoadUsers();
+            this.FormClosed += (s, args) => Application.Exit();
+        }
+
+        private void AdminUserForm_Load(object sender, EventArgs e)
+        {
+
+        }
+
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void LoadUsers()
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string query = @"SELECT [Id], [login], [email], [password], [RoleId]
+                                FROM [User] ORDER BY [ID]";
+
+                    SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
+                    userTable = new DataTable();
+                    adapter.Fill(userTable);
+                }
+
+                dataGridViewuser.Columns.Clear();
+
+
+                DataGridViewTextBoxColumn colId = new DataGridViewTextBoxColumn
+                {
+                    DataPropertyName = "Id",
+                    HeaderText = "ID",
+                    Width = 10,
+                    ReadOnly = true
+                };
+                dataGridViewuser.Columns.Add(colId);
+
+                DataGridViewTextBoxColumn collogin = new DataGridViewTextBoxColumn
+                {
+                    DataPropertyName = "login",
+                    HeaderText = "Логин",
+                    Width = 10
+                };
+                dataGridViewuser.Columns.Add(collogin);
+
+                DataGridViewTextBoxColumn colemail = new DataGridViewTextBoxColumn
+                {
+                    DataPropertyName = "email",
+                    HeaderText = "Почта",
+                    Width = 10
+                };
+                dataGridViewuser.Columns.Add(colemail);
+
+                DataGridViewTextBoxColumn colpassword = new DataGridViewTextBoxColumn
+                {
+                    DataPropertyName = "password",
+                    HeaderText = "Пароль",
+                    Width = 10
+                };
+                dataGridViewuser.Columns.Add(colpassword);
+
+                DataGridViewTextBoxColumn colRoleId = new DataGridViewTextBoxColumn
+                {
+                    DataPropertyName = "RoleId",
+                    HeaderText = "ID Роли",
+                    Width = 10,
+                };
+                dataGridViewuser.Columns.Add(colRoleId);
+
+                dataGridViewuser.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                dataGridViewuser.RowTemplate.Height = 40;
+                dataGridViewuser.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+                dataGridViewuser.MultiSelect = false;
+
+
+                dataGridViewuser.DataSource = userTable;
+
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки пользователей: {ex.Message}", "Ошибка",
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+        }
+
+
+        private void back_Click(object sender, EventArgs e)
+        {
+            AdminMenuForm adminMenuForm = new AdminMenuForm();
+            adminMenuForm.ShowDialog();
+            this.Close();
+        }
+
+        private void adduser_bt_Click(object sender, EventArgs e)
+        {
+            DataRow newRow = userTable.NewRow();
+            newRow["login"] = "";
+            newRow["email"] = "";
+            newRow["password"] = "";
+            newRow["RoleId"] = 0;
+            userTable.Rows.Add(newRow);
+            dataGridViewuser.CurrentCell = dataGridViewuser.Rows[dataGridViewuser.Rows.Count - 1].Cells[1];
+            dataGridViewuser.BeginEdit(true);
+        }
+
+        private void save_bt_Click(object sender, EventArgs e)
+        {
+            foreach (DataRow row in userTable.Rows)
+            {
+                if (row.RowState != DataRowState.Deleted)
+                {
+                    if (string.IsNullOrWhiteSpace(row["login"].ToString()) || string.IsNullOrWhiteSpace(row["email"].ToString())
+                        || string.IsNullOrWhiteSpace(row["password"].ToString()) || string.IsNullOrWhiteSpace(row["RoleId"].ToString()))
+                    {
+                        MessageBox.Show("Все данные пользователя должны быть заполнены!", "Ошибка",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                }
+            }
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                foreach (DataRow row in userTable.Rows)
+                {
+                    if (row.RowState == DataRowState.Added)
+                    {
+                        // Новый пользователь
+                        string maxIdQuery = "SELECT ISNULL(MAX([Id]), 0) + 1 FROM [User]";
+                        SqlCommand cmd = new SqlCommand(maxIdQuery, connection);
+                        int newId = (int)cmd.ExecuteScalar();
+                        row["Id"] = newId;
+
+                        string insert = @"INSERT INTO [User] ([Id], [login], [email], [password], [RoleId])
+                                  VALUES (@Id, @login, @email, @password, @RoleId)";
+                        cmd = new SqlCommand(insert, connection);
+                        cmd.Parameters.AddWithValue("@Id", newId);
+                        cmd.Parameters.AddWithValue("@login", row["login"].ToString().Trim());
+                        cmd.Parameters.AddWithValue("@email", row["email"].ToString().Trim());
+                        cmd.Parameters.AddWithValue("@password", row["password"].ToString().Trim());
+                        cmd.Parameters.AddWithValue("@RoleId", Convert.ToInt32(row["RoleId"]));
+
+
+                        cmd.ExecuteNonQuery();
+                    }
+                    else if (row.RowState == DataRowState.Modified)
+                    {
+                        // Обновление пользователя
+                        string update = @"UPDATE [User]
+                                  SET [login] = @login, [email] = @email,
+                                      [password] = @password, [RoleId] = @RoleId
+                                  WHERE [Id] = @Id";
+                        SqlCommand cmd = new SqlCommand(update, connection);
+                        cmd.Parameters.AddWithValue("@Id", Convert.ToInt32(row["Id"]));
+                        cmd.Parameters.AddWithValue("@login", row["login"].ToString().Trim());
+                        cmd.Parameters.AddWithValue("@email", row["email"].ToString().Trim());
+                        cmd.Parameters.AddWithValue("@password", row["password"].ToString().Trim());
+                        cmd.Parameters.AddWithValue("@RoleId", Convert.ToInt32(row["RoleId"]));
+                        
+
+                        cmd.ExecuteNonQuery();
+                    }
+                    else if (row.RowState == DataRowState.Deleted)
+                    {
+                        // Удаление пользователя
+                        int roomId = Convert.ToInt32(row["Id", DataRowVersion.Original]);
+
+                        string deleteUsers = "DELETE FROM [User] WHERE [Id] = @Id";
+                        SqlCommand cmd = new SqlCommand(deleteUsers, connection);
+                        cmd.Parameters.AddWithValue("@Id", roomId);
+                        cmd.ExecuteNonQuery();
+
+                        
+                    }
+                }
+            }
+
+            userTable.AcceptChanges();
+            MessageBox.Show("Все изменения сохранены!", "Успех",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            LoadUsers();
+        }
+
+        private void deleteuser_bt_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewuser.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Выберите строку для удаления.", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            DataGridViewRow selectedRow = dataGridViewuser.SelectedRows[0];
+            string userName = selectedRow.Cells[1].Value?.ToString() ?? "";
+
+            DialogResult result = MessageBox.Show(
+                $"Удалить пользователя с логином «{userName}»?\nНажмите «Сохранить», чтобы подтвердить.",
+                "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                dataGridViewuser.Rows.RemoveAt(selectedRow.Index);
+            }
+        }
+    }
+}
+
