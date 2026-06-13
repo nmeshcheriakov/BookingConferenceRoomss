@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace BookingConferenceRoomss
 {
@@ -27,15 +28,8 @@ namespace BookingConferenceRoomss
             InitializeComponent();
         }
 
-        private void groupBox1_Enter(object sender, EventArgs e)
-        {
-
-        }
-
-        private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
-        {
-
-        }
+        private void groupBox1_Enter(object sender, EventArgs e) { }
+        private void dateTimePicker1_ValueChanged(object sender, EventArgs e) { }
 
         private void MainFrom_Load(object sender, EventArgs e)
         {
@@ -73,9 +67,17 @@ namespace BookingConferenceRoomss
                     string query = @"SELECT [Id] as 'Номер зала', 
                                             [Name] as 'Название зала', 
                                             [Capacity] as 'Вместимость (чел.)', 
-                                            [description] as 'Описание' 
-                                     FROM [ConferenceRooms] 
-                                     WHERE [Capacity] >= @guests";
+                                            [description] as 'Описание',
+                                            [image]
+                                     FROM [ConferenceRooms] CR
+                                     WHERE [Capacity] >= @guests
+                                     AND NOT EXISTS(
+                                        SELECT 1 FROM [Booking] B
+                                        WHERE B.[ConferenceRoomId] = CR.[Id]
+                                        AND B.[StatusId] = 1 -- Проверяем только активные брони
+                                        AND B.[CheckIn] < @finish
+                                        AND B.[CheckOut] > @start
+                                     )";
 
                     // Если в строке поиска что-то написано — добавляем условие LIKE
                     if (!string.IsNullOrWhiteSpace(search_tb.Text))
@@ -85,6 +87,8 @@ namespace BookingConferenceRoomss
 
                     using (SqlCommand cmd = new SqlCommand(query, connection))
                     {
+                        cmd.Parameters.AddWithValue("@start", start.Value);
+                        cmd.Parameters.AddWithValue("@finish", finish.Value);
                         cmd.Parameters.AddWithValue("@guests", (int)guest.Value);
 
                         if (!string.IsNullOrWhiteSpace(search_tb.Text))
@@ -109,9 +113,15 @@ namespace BookingConferenceRoomss
 
         private void bron_bt_Click(object sender, EventArgs e)
         {
+
             if (dgv.CurrentRow == null)
             {
                 MessageBox.Show("Пожалуйста, выберите конференц-зал из списка таблицы!", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            if (start.Value >= finish.Value)
+            {
+                MessageBox.Show("Время начала бронирования не может быть позже или равно времени окончания!", "Ошибка времени", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
             int roomId = Convert.ToInt32(dgv.CurrentRow.Cells["Номер зала"].Value);
@@ -155,9 +165,17 @@ namespace BookingConferenceRoomss
             }
         }
 
-        private void groupBox2_Enter(object sender, EventArgs e)
-        {
+        private void groupBox2_Enter(object sender, EventArgs e) { }
+        private void dgv_CellContentClick(object sender, DataGridViewCellEventArgs e) { }
 
+        private void search_tb_TextChanged(object sender, EventArgs e)
+        {
+            LoadAvailableRooms();
+        }
+
+        private void MainFrom_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Application.Exit();
         }
     }
 }

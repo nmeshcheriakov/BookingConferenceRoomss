@@ -29,7 +29,13 @@ namespace BookingConferenceRooms
                         END";
                     using (SqlCommand cmd = new SqlCommand(dropDb, connection))
                     {
-                        cmd.ExecuteNonQuery();
+                        try
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                        catch(Exception) {
+
+                        }
                     }
 
                     // Создаём базу заново
@@ -64,19 +70,13 @@ namespace BookingConferenceRooms
                 if (!TableExists(connection, "ConferenceRooms"))
                     Execute(@"CREATE TABLE [dbo].[ConferenceRooms] ([Id] INT NOT NULL PRIMARY KEY, [Name] NVARCHAR(50) NOT NULL, [Capacity] INT NOT NULL, [description] NVARCHAR(50) NULL, [image] IMAGE NULL)", connection);
 
+                // ВАЖНО: Изменили NVARCHAR(50) на NVARCHAR(100) для поля [password], чтобы хэш BCrypt помещался целиком!
                 if (!TableExists(connection, "User"))
-                    Execute(@"CREATE TABLE [dbo].[User] ([Id] INT NOT NULL PRIMARY KEY, [login] NVARCHAR(50) NOT NULL, [email] NVARCHAR(50) NOT NULL, [password] NVARCHAR(50) NOT NULL, [RoleId] INT NOT NULL, CONSTRAINT [FK_User_Role] FOREIGN KEY ([RoleId]) REFERENCES [dbo].[Role]([Id]))", connection);
+                    Execute(@"CREATE TABLE [dbo].[User] ([Id] INT NOT NULL PRIMARY KEY, [login] NVARCHAR(50) NOT NULL, [email] NVARCHAR(50) NOT NULL, [password] NVARCHAR(100) NOT NULL, [RoleId] INT NOT NULL, CONSTRAINT [FK_User_Role] FOREIGN KEY ([RoleId]) REFERENCES [dbo].[Role]([Id]))", connection);
 
                 if (!TableExists(connection, "Booking"))
                     Execute(@"CREATE TABLE [dbo].[Booking] ([Id] INT NOT NULL PRIMARY KEY, [CheckIn] DATETIME NOT NULL, [CheckOut] DATETIME NOT NULL, [Guests] INT NOT NULL, [UserId] INT NOT NULL, [ConferenceRoomId] INT NOT NULL, [StatusId] INT NOT NULL, CONSTRAINT [FK_Booking_User] FOREIGN KEY ([UserId]) REFERENCES [dbo].[User]([Id]), CONSTRAINT [FK_Booking_ConferenceRooms] FOREIGN KEY ([ConferenceRoomId]) REFERENCES [dbo].[ConferenceRooms]([Id]), CONSTRAINT [FK_Booking_StatusBooking] FOREIGN KEY ([StatusId]) REFERENCES [dbo].[StatusBooking]([Id]))", connection);
 
-                // Начальные данные
-                TryExecute(@"IF NOT EXISTS (SELECT * FROM [Role] WHERE [Id] = 1) INSERT INTO [Role] ([Id], [name]) VALUES (1, N'Администратор')", connection);
-                TryExecute(@"IF NOT EXISTS (SELECT * FROM [Role] WHERE [Id] = 2) INSERT INTO [Role] ([Id], [name]) VALUES (2, N'Пользователь')", connection);
-                TryExecute(@"IF NOT EXISTS (SELECT * FROM [StatusBooking] WHERE [Id] = 1) INSERT INTO [StatusBooking] ([Id], [Name]) VALUES (1, N'Подтверждено')", connection);
-                TryExecute(@"IF NOT EXISTS (SELECT * FROM [StatusBooking] WHERE [Id] = 2) INSERT INTO [StatusBooking] ([Id], [Name]) VALUES (2, N'Отменено')", connection);
-                TryExecute(@"IF NOT EXISTS (SELECT * FROM [StatusBooking] WHERE [Id] = 3) INSERT INTO [StatusBooking] ([Id], [Name]) VALUES (3, N'Завершено')", connection);
-                TryExecute(@"IF NOT EXISTS (SELECT * FROM [User] WHERE [login] = 'admin') INSERT INTO [User] ([Id], [email], [login], [password], [RoleId]) VALUES (1, N'Администратор', 'admin', 'admin', 1)", connection);
                 // --- НАЧАЛЬНЫЕ СПРАВОЧНЫЕ ДАННЫЕ ---
                 TryExecute(@"IF NOT EXISTS (SELECT * FROM [Role] WHERE [Id] = 1) INSERT INTO [Role] ([Id], [name]) VALUES (1, N'Администратор')", connection);
                 TryExecute(@"IF NOT EXISTS (SELECT * FROM [Role] WHERE [Id] = 2) INSERT INTO [Role] ([Id], [name]) VALUES (2, N'Пользователь')", connection);
@@ -85,7 +85,13 @@ namespace BookingConferenceRooms
                 TryExecute(@"IF NOT EXISTS (SELECT * FROM [StatusBooking] WHERE [Id] = 2) INSERT INTO [StatusBooking] ([Id], [Name]) VALUES (2, N'Отменено')", connection);
                 TryExecute(@"IF NOT EXISTS (SELECT * FROM [StatusBooking] WHERE [Id] = 3) INSERT INTO [StatusBooking] ([Id], [Name]) VALUES (3, N'Завершено')", connection);
 
-                TryExecute(@"IF NOT EXISTS (SELECT * FROM [User] WHERE [login] = 'admin') INSERT INTO [User] ([Id], [email], [login], [password], [RoleId]) VALUES (1, N'Администратор', 'admin', 'admin', 1)", connection);
+                // 1. Если админа нет — создаем его
+                TryExecute(@"IF NOT EXISTS (SELECT * FROM [User] WHERE [login] = 'admin') 
+                             INSERT INTO [User] ([Id], [email], [login], [password], [RoleId]) 
+                             VALUES (1, N'admin@mail.ru', 'admin', 'temporary', 1)", connection);
+
+                // 2. ЖЕСТКО обновляем ему хэш пароля на правильный (в одну строку, без переносов!)
+                TryExecute(@"UPDATE [User] SET [password] = '$2a$11$qR7tF8vB5k9Z1X2y3M4u5OasGv7E6Pz8HwR3mN2o1CxBiGyDqFlSm' WHERE [login] = 'admin'", connection);
 
                 // --- ДОБАВЛЕНИЕ ТЕСТОВЫХ КОНФЕРЕНЦ-ЗАЛОВ ---
                 TryExecute(@"IF NOT EXISTS (SELECT * FROM [ConferenceRooms] WHERE [Id] = 1) 
@@ -99,6 +105,17 @@ namespace BookingConferenceRooms
                 TryExecute(@"IF NOT EXISTS (SELECT * FROM [ConferenceRooms] WHERE [Id] = 3) 
                              INSERT INTO [ConferenceRooms] ([Id], [Name], [Capacity], [description]) 
                              VALUES (3, N'Президентский VIP-зал', 15, N'Зал круглого стола с премиальным оборудованием.')", connection);
+
+                // --- НОВАЯ СТРОКА: ДОБАВЛЕНИЕ ДАННЫХ О ДАТЕ И ВРЕМЕНИ БРОНИРОВАНИЯ ---
+                // Добавляем тестовое бронирование №1 для зала Альфа (Id=1), пользователя Администратор (Id=1), статус Подтверждено (Id=1)
+                TryExecute(@"IF NOT EXISTS (SELECT * FROM [Booking] WHERE [Id] = 1) 
+                             INSERT INTO [Booking] ([Id], [CheckIn], [CheckOut], [Guests], [UserId], [ConferenceRoomId], [StatusId]) 
+                             VALUES (1, '2026-06-15 10:00:00', '2026-06-15 12:30:00', 5, 1, 1, 1)", connection);
+
+                // Добавляем тестовое бронирование №2 для зала Омега (Id=2)
+                TryExecute(@"IF NOT EXISTS (SELECT * FROM [Booking] WHERE [Id] = 2) 
+                             INSERT INTO [Booking] ([Id], [CheckIn], [CheckOut], [Guests], [UserId], [ConferenceRoomId], [StatusId]) 
+                             VALUES (2, '2026-06-16 14:00:00', '2026-06-16 18:00:00', 30, 1, 2, 1)", connection);
             }
         }
 

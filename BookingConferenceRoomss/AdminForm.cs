@@ -41,7 +41,7 @@ namespace BookingConferenceRoomss
         private void back_Click(object sender, EventArgs e)
         {
             AdminMenuForm adminMenuForm = new AdminMenuForm();
-            adminMenuForm.ShowDialog();
+            adminMenuForm.Show();
             this.Close();
         }
 

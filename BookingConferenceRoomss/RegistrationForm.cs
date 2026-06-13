@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.SqlClient;
+using BCrypt.Net;
 
 namespace BookingConferenceRoomss
 {
@@ -22,153 +23,106 @@ namespace BookingConferenceRoomss
             InitializeComponent();
         }
 
-        private void RegistrationForm_Load(object sender, EventArgs e)
-        {
-
-
-        }
-
+        private void RegistrationForm_Load(object sender, EventArgs e) { }
         private void reg_bt_Click(object sender, EventArgs e)
         {
+            string login = log_tb.Text.Trim();
+            string email = email_tb.Text.Trim();
+            string password = password_tb.Text.Trim();
+            string repeatPassword = repeat_password_tb.Text.Trim();
+
+            if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(email) ||
+                string.IsNullOrEmpty(password) || string.IsNullOrEmpty(repeatPassword))
+            {
+                MessageBox.Show("Все поля должны быть заполнены!", "Ошибка валидации", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // 2. Проверка совпадения паролей
+            if (password != repeatPassword)
+            {
+                MessageBox.Show("Пароли должны совпадать!", "Ошибка валидации", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // 4. РАБОТА С БАЗОЙ ДАННЫХ
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
                 {
-                    
+                    connection.Open();
+
+                    // Проверка существования логина
+                    string checkQuery = "SELECT COUNT(*) FROM [User] WHERE [login] = @login";
+                    using (SqlCommand checkCmd = new SqlCommand(checkQuery, connection))
                     {
-                        connection.Open();
+                        checkCmd.Parameters.AddWithValue("@login", login);
+                        int userExists = (int)checkCmd.ExecuteScalar();
 
-                        // Проверка существования логина
-                        string checkQuery = "SELECT COUNT(*) FROM [User] WHERE [login] = @login";
-                        using (SqlCommand checkCmd = new SqlCommand(checkQuery, connection))
+                        if (userExists > 0)
                         {
-                            checkCmd.Parameters.AddWithValue("@login", log_tb.Text.Trim());
-                            int userExists = (int)checkCmd.ExecuteScalar();
-
-                            if (userExists > 0)
-                            {
-                                MessageBox.Show("Пользователь с таким логином уже существует!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
-                            }
-
-                            if (log_tb.Text == "" || email_tb.Text == "" || 
-                                password_tb.Text == "" || repeat_password_tb.Text == "")
-                            {
-                                MessageBox.Show("Все поля должны быть заполнены!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
-                            }
-
-                            if (repeat_password_tb.Text != password_tb.Text)
-                            {
-                                MessageBox.Show("Пароли должны совпадать!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
-                            }
+                            MessageBox.Show("Пользователь с таким логином уже существует!", "Ошибка регистрации", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
                         }
-                            // Получаем следующий Id
-                        int nextId;
-                        string idQuery = "SELECT ISNULL(MAX(Id), 0) + 1 FROM [User]";
-                        using (SqlCommand idCmd = new SqlCommand(idQuery, connection))
-                        {
-                            nextId = (int)idCmd.ExecuteScalar();
-                        }
-
-                        // Вставляем пользователя
-                        string insertQuery = "INSERT INTO [User] ([Id], [login], [email], [password], [RoleId]) VALUES (@id, @login, @email, @password, 2)";
-                        using (SqlCommand insertCmd = new SqlCommand(insertQuery, connection))
-                        {
-                            insertCmd.Parameters.AddWithValue("@id", nextId);
-                            insertCmd.Parameters.AddWithValue("@login", log_tb.Text.Trim()); // Используем логин как ФИО, если нет поля ФИО
-                            insertCmd.Parameters.AddWithValue("@email", log_tb.Text.Trim());
-                            insertCmd.Parameters.AddWithValue("@password", password_tb.Text.Trim());
-                            insertCmd.ExecuteNonQuery();
-                        }
-
-                        MessageBox.Show("Регистрация успешно завершена!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                        Form1 loginForm = new Form1();
-                        loginForm.Show();
-                        this.Close();
                     }
+
+                    // Получаем следующий Id
+                    int nextId;
+                    string idQuery = "SELECT ISNULL(MAX(Id), 0) + 1 FROM [User]";
+                    using (SqlCommand idCmd = new SqlCommand(idQuery, connection))
+                    {
+                        nextId = (int)idCmd.ExecuteScalar();
+                    }
+
+                    // Хэшируем очищенный от пробелов пароль
+                    string securePasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
+
+                    // Вставляем пользователя (RoleId = 2 — обычный пользователь)
+                    string insertQuery = "INSERT INTO [User] ([Id], [login], [email], [password], [RoleId]) VALUES (@id, @login, @email, @password, 2)";
+                    using (SqlCommand insertCmd = new SqlCommand(insertQuery, connection))
+                    {
+                        insertCmd.Parameters.AddWithValue("@id", nextId);
+                        insertCmd.Parameters.AddWithValue("@login", login);
+                        insertCmd.Parameters.AddWithValue("@email", email);
+                        insertCmd.Parameters.AddWithValue("@password", securePasswordHash);
+                        insertCmd.ExecuteNonQuery();
+                    }
+
+                    MessageBox.Show("Регистрация успешно завершена!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    // Просто закрываем форму. Наша Form1 сама поймет это и покажется на экране!
+                    this.Close();
                 }
                 catch (SqlException sqlEx)
                 {
-                    // Выводим ВСЕ ошибки SQL
                     string allErrors = "";
                     foreach (SqlError error in sqlEx.Errors)
                     {
                         allErrors += $"Ошибка SQL: {error.Message}\nНомер: {error.Number}\n\n";
                     }
-                    MessageBox.Show(allErrors, "Ошибка SQL", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(allErrors, "Ошибка СУБД", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 catch (Exception ex)
                 {
-                    string fullError = ex.Message;
-                    Exception inner = ex.InnerException;
-                    while (inner != null)
-                    {
-                        fullError += "\n→ " + inner.Message;
-                        inner = inner.InnerException;
-                    }
-                    MessageBox.Show(fullError, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Критическая ошибка: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-
-        }
-
-        private void RegistrationForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-        }
-
+        } 
         private void Back_bt_Click(object sender, EventArgs e)
         {
-            Form1 loginForm = new Form1();
-            loginForm.Show();
             this.Close();
         }
 
-        private void repeat_password_tb_TextChanged(object sender, EventArgs e)
-        {
+        private void RegistrationForm_FormClosed(object sender, FormClosedEventArgs e) { }
+        private void repeat_password_tb_TextChanged(object sender, EventArgs e) { }
+        private void label5_Click(object sender, EventArgs e) { }
+        private void label4_Click(object sender, EventArgs e) { }
+        private void label3_Click(object sender, EventArgs e) { }
+        private void label2_Click(object sender, EventArgs e) { }
+        private void email_tb_TextChanged(object sender, EventArgs e) { }
+        private void password_tb_TextChanged(object sender, EventArgs e) { }
+        private void log_tb_TextChanged(object sender, EventArgs e) { }
+        private void label1_Click(object sender, EventArgs e){}
 
-        }
-
-        private void label5_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label4_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label3_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void email_tb_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void password_tb_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void log_tb_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
     }
 }

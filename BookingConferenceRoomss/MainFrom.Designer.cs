@@ -148,6 +148,7 @@
             this.search_tb.Name = "search_tb";
             this.search_tb.Size = new System.Drawing.Size(263, 32);
             this.search_tb.TabIndex = 6;
+            this.search_tb.TextChanged += new System.EventHandler(this.search_tb_TextChanged);
             // 
             // bron_bt
             // 
@@ -171,6 +172,7 @@
             this.dgv.ReadOnly = true;
             this.dgv.Size = new System.Drawing.Size(796, 289);
             this.dgv.TabIndex = 9;
+            this.dgv.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgv_CellContentClick);
             // 
             // MainFrom
             // 
@@ -185,6 +187,7 @@
             this.Font = new System.Drawing.Font("Times New Roman", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.Name = "MainFrom";
             this.Text = "MainFrom";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainFrom_FormClosing);
             this.Load += new System.EventHandler(this.MainFrom_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
