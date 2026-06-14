@@ -21,17 +21,25 @@ namespace BookingConferenceRoomss
 
         private DataTable roomsTable;
 
+        private bool isBackButtonClicked = false;
+
         public AdminForm()
         {
             InitializeComponent();
             LoadRooms();
-            this.FormClosed += (s, args) => Application.Exit();
+            this.FormClosing += AdminForm_FormClosing;
+
         }
 
-        private void AdminForm_FormClosed(object sender, FormClosedEventArgs e)
+        private void AdminForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             
+            if (!isBackButtonClicked)
+            {
+                Application.Exit();
+            }
         }
+
 
         private void AdminForm_Load(object sender, EventArgs e)
         {
@@ -40,8 +48,7 @@ namespace BookingConferenceRoomss
 
         private void back_Click(object sender, EventArgs e)
         {
-            AdminMenuForm adminMenuForm = new AdminMenuForm();
-            adminMenuForm.Show();
+            isBackButtonClicked = true;
             this.Close();
         }
 
@@ -105,13 +112,13 @@ namespace BookingConferenceRoomss
                 {
                     DataPropertyName = "image",
                     HeaderText = "Фото",
-                    Width = 100,
+                    Width = 150,
                     ImageLayout = DataGridViewImageCellLayout.Zoom
                 };
                 dataGridView1.Columns.Add(colImage);
 
                 dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-                dataGridView1.RowTemplate.Height = 120;
+                dataGridView1.RowTemplate.Height = 150;
                 dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
                 dataGridView1.MultiSelect = false;
 

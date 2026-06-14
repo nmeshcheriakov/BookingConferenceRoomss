@@ -17,12 +17,23 @@ namespace BookingConferenceRoomss
     {
         private string connectionString = ConfigurationManager.ConnectionStrings["BookingDB"].ConnectionString;
 
+        private bool isBackButtonClicked = false;
+
         private DataTable userTable;
         public AdminUserForm()
         {
             InitializeComponent();
             LoadUsers();
-            this.FormClosed += (s, args) => Application.Exit();
+            this.FormClosing += AdminUserForm_FormClosing;
+        }
+
+        private void AdminUserForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+           
+            if (!isBackButtonClicked)
+            {
+                Application.Exit();
+            }
         }
 
         private void AdminUserForm_Load(object sender, EventArgs e)
@@ -117,8 +128,7 @@ namespace BookingConferenceRoomss
 
         private void back_Click(object sender, EventArgs e)
         {
-            AdminMenuForm adminMenuForm = new AdminMenuForm();
-            adminMenuForm.ShowDialog();
+            isBackButtonClicked = true;
             this.Close();
         }
 
@@ -215,9 +225,14 @@ namespace BookingConferenceRoomss
                         {
                             // Удаление пользователя
                             int userId = Convert.ToInt32(row["Id", DataRowVersion.Original]);
+                            //Удаляем брони пользователя
+                            string deleteBookings = "DELETE FROM [Booking] WHERE [UserId] = @UserId";
+                            SqlCommand cmd = new SqlCommand(deleteBookings, connection, transaction);
+                            cmd.Parameters.AddWithValue("@UserId", userId);
+                            cmd.ExecuteNonQuery();
 
                             string deleteUsers = "DELETE FROM [User] WHERE [Id] = @Id";
-                            SqlCommand cmd = new SqlCommand(deleteUsers, connection, transaction);
+                            cmd = new SqlCommand(deleteUsers, connection, transaction);
                             cmd.Parameters.AddWithValue("@Id", userId);
                             cmd.ExecuteNonQuery();
                         }

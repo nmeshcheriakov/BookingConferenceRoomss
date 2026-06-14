@@ -17,11 +17,12 @@ namespace BookingConferenceRoomss
     public partial class RegistrationForm : Form
     {
         public string connectionString = ConfigurationManager.ConnectionStrings["BookingDB"].ConnectionString;
-
+        private bool isBackButtonClicked = false;
 
         public RegistrationForm()
         {
             InitializeComponent();
+            this.FormClosing += RegistrationForm_FormClosing;
         }
 
         private void RegistrationForm_Load(object sender, EventArgs e) { }
@@ -90,8 +91,7 @@ namespace BookingConferenceRoomss
                     MessageBox.Show("Регистрация успешно завершена!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
 
-                    Form1 form1 = new Form1();
-                    form1.Show();
+                    isBackButtonClicked = true;
                     this.Close();
                 }
                 catch (SqlException sqlEx)
@@ -111,13 +111,31 @@ namespace BookingConferenceRoomss
         }
         private void Back_bt_Click(object sender, EventArgs e)
         {
-            Form1 form1 = new Form1();
-            form1.Show();
+            isBackButtonClicked = true;
             this.Close();
-
         }
 
-        private void RegistrationForm_FormClosed(object sender, FormClosedEventArgs e) { }
+        private void RegistrationForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            foreach (Form form in Application.OpenForms)
+            {
+                if (form is Form1)
+                {
+                    form.Show();
+                    break;
+                }
+            }
+        }
+
+        private void RegistrationForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            
+            if (!isBackButtonClicked)
+            {
+                Application.Exit();
+            }
+        }
+
         private void repeat_password_tb_TextChanged(object sender, EventArgs e) { }
         private void label5_Click(object sender, EventArgs e) { }
         private void label4_Click(object sender, EventArgs e) { }

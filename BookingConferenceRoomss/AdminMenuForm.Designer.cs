@@ -74,7 +74,7 @@
             this.Back.Name = "Back";
             this.Back.Size = new System.Drawing.Size(213, 25);
             this.Back.TabIndex = 3;
-            this.Back.Text = "Выйти";
+            this.Back.Text = "Назад";
             this.Back.UseVisualStyleBackColor = true;
             this.Back.Click += new System.EventHandler(this.Back_Click);
             // 

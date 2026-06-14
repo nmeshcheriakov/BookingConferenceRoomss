@@ -17,15 +17,15 @@ namespace BookingConferenceRoomss
     public partial class MainFrom : Form
     {
         private string connectionString = ConfigurationManager.ConnectionStrings["BookingDB"].ConnectionString;
-
+        private bool isBackButtonClicked = false;
 
 
         public int CurrentUserId { get; set; }
 
         public MainFrom()
         {
-
             InitializeComponent();
+            this.FormClosing += MainFrom_FormClosing;
         }
 
         private void groupBox1_Enter(object sender, EventArgs e) { }
@@ -175,7 +175,28 @@ namespace BookingConferenceRoomss
 
         private void MainFrom_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Application.Exit();
+            if (!isBackButtonClicked)
+            {
+                Application.Exit();
+            }
+            else
+            {
+                
+                foreach (Form form in Application.OpenForms)
+                {
+                    if (form is Form1)
+                    {
+                        form.Show();
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void back_Click(object sender, EventArgs e)
+        {
+            isBackButtonClicked = true;
+            this.Close();
         }
     }
 }

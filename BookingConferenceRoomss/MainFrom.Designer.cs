@@ -40,6 +40,7 @@
             this.search_tb = new System.Windows.Forms.TextBox();
             this.bron_bt = new System.Windows.Forms.Button();
             this.dgv = new System.Windows.Forms.DataGridView();
+            this.back = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.guest)).BeginInit();
             this.groupBox2.SuspendLayout();
@@ -167,12 +168,23 @@
             this.dgv.AllowUserToDeleteRows = false;
             this.dgv.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgv.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgv.Location = new System.Drawing.Point(-8, 195);
+            this.dgv.Location = new System.Drawing.Point(-1, 194);
             this.dgv.Name = "dgv";
             this.dgv.ReadOnly = true;
-            this.dgv.Size = new System.Drawing.Size(796, 289);
+            this.dgv.Size = new System.Drawing.Size(796, 252);
             this.dgv.TabIndex = 9;
             this.dgv.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgv_CellContentClick);
+            // 
+            // back
+            // 
+            this.back.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.back.Location = new System.Drawing.Point(-1, 452);
+            this.back.Name = "back";
+            this.back.Size = new System.Drawing.Size(142, 33);
+            this.back.TabIndex = 10;
+            this.back.Text = "Назад";
+            this.back.UseVisualStyleBackColor = true;
+            this.back.Click += new System.EventHandler(this.back_Click);
             // 
             // MainFrom
             // 
@@ -180,6 +192,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.ClientSize = new System.Drawing.Size(800, 485);
+            this.Controls.Add(this.back);
             this.Controls.Add(this.dgv);
             this.Controls.Add(this.bron_bt);
             this.Controls.Add(this.groupBox2);
@@ -213,5 +226,6 @@
         private System.Windows.Forms.Button show_bt;
         private System.Windows.Forms.Button bron_bt;
         private System.Windows.Forms.DataGridView dgv;
+        private System.Windows.Forms.Button back;
     }
 }

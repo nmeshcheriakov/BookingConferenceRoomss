@@ -12,9 +12,13 @@ namespace BookingConferenceRoomss
 {
     public partial class AdminMenuForm : Form
     {
+
+        private bool isBackButtonClicked = false;
+
         public AdminMenuForm()
         {
             InitializeComponent();
+            this.FormClosing += AdminMenuForm_FormClosing;
         }
 
         private void AdminMenuForm_Load(object sender, EventArgs e)
@@ -25,10 +29,11 @@ namespace BookingConferenceRoomss
 
         private void Back_Click(object sender, EventArgs e)
         {
-            Form1 loginForm = new Form1();
-            loginForm.Show();
-            this.Close();
+
+            isBackButtonClicked = true;
+            this.Close(); 
         }
+        
 
         private void label1_Click(object sender, EventArgs e)
         {
@@ -38,17 +43,37 @@ namespace BookingConferenceRoomss
         private void rooms_bt_Click(object sender, EventArgs e)
         {
             AdminForm adminForm = new AdminForm();
+            adminForm.FormClosed += (s, args) => this.Show(); 
             adminForm.Show();
-            //adminForm.FormClosed += (s, args) => this.Close();
-            this.Hide();
+            this.Hide(); 
         }
 
         private void users_bt_Click(object sender, EventArgs e)
         {
             AdminUserForm adminUserForm = new AdminUserForm();
+            adminUserForm.FormClosed += (s, args) => this.Show(); 
             adminUserForm.Show();
-            //adminUserForm.FormClosed += (s, args) => this.Close();
-            this.Hide();
+            this.Hide(); 
+        }
+        private void AdminMenuForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Если закрыли не через кнопку "Назад" - закрываем всё приложение
+            if (!isBackButtonClicked)
+            {
+                Application.Exit();
+            }
+            else
+            {
+                // Если через кнопку "Назад" - показываем форму авторизации
+                foreach (Form form in Application.OpenForms)
+                {
+                    if (form is Form1)
+                    {
+                        form.Show();
+                        break;
+                    }
+                }
+            }
         }
     }
 }
