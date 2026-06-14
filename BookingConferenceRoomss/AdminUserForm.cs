@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BCrypt.Net;
 
 namespace BookingConferenceRoomss
 {
@@ -151,65 +152,90 @@ namespace BookingConferenceRoomss
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
+                SqlTransaction transaction = connection.BeginTransaction();
 
-                foreach (DataRow row in userTable.Rows)
+                try
                 {
-                    if (row.RowState == DataRowState.Added)
+                    foreach (DataRow row in userTable.Rows)
                     {
-                        // Новый пользователь
-                        string maxIdQuery = "SELECT ISNULL(MAX([Id]), 0) + 1 FROM [User]";
-                        SqlCommand cmd = new SqlCommand(maxIdQuery, connection);
-                        int newId = (int)cmd.ExecuteScalar();
-                        row["Id"] = newId;
+                        if (row.RowState == DataRowState.Added)
+                        {
+                            string plainPassword = row["password"].ToString().Trim();
+                            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(plainPassword);
 
-                        string insert = @"INSERT INTO [User] ([Id], [login], [email], [password], [RoleId])
-                                  VALUES (@Id, @login, @email, @password, @RoleId)";
-                        cmd = new SqlCommand(insert, connection);
-                        cmd.Parameters.AddWithValue("@Id", newId);
-                        cmd.Parameters.AddWithValue("@login", row["login"].ToString().Trim());
-                        cmd.Parameters.AddWithValue("@email", row["email"].ToString().Trim());
-                        cmd.Parameters.AddWithValue("@password", row["password"].ToString().Trim());
-                        cmd.Parameters.AddWithValue("@RoleId", Convert.ToInt32(row["RoleId"]));
+                            string maxIdQuery = "SELECT ISNULL(MAX([Id]), 0) + 1 FROM [User]";
+                            SqlCommand cmd = new SqlCommand(maxIdQuery, connection, transaction);
+                            int newId = (int)cmd.ExecuteScalar();
+                            row["Id"] = newId;
 
+                            string insert = @"INSERT INTO [User] ([Id], [login], [email], [password], [RoleId])
+                                      VALUES (@Id, @login, @email, @password, @RoleId)";
+                            cmd = new SqlCommand(insert, connection, transaction);
+                            cmd.Parameters.AddWithValue("@Id", newId);
+                            cmd.Parameters.AddWithValue("@login", row["login"].ToString().Trim());
+                            cmd.Parameters.AddWithValue("@email", row["email"].ToString().Trim());
+                            cmd.Parameters.AddWithValue("@password", hashedPassword); // Сохраняем хэш
+                            cmd.Parameters.AddWithValue("@RoleId", Convert.ToInt32(row["RoleId"]));
 
-                        cmd.ExecuteNonQuery();
+                            cmd.ExecuteNonQuery();
+                        }
+                        else if (row.RowState == DataRowState.Modified)
+                        {
+                            // Обновление пользователя
+                            string oldPassword = row["password", DataRowVersion.Original].ToString();
+                            string newPassword = row["password"].ToString().Trim();
+
+                            string finalPassword;
+
+                            if (oldPassword != newPassword)
+                            {
+                                // Пароль изменился - хэшируем новый
+                                finalPassword = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                            }
+                            else
+                            {
+                                // Пароль не изменился - оставляем как есть (это уже хэш)
+                                finalPassword = newPassword;
+                            }
+
+                            string update = @"UPDATE [User]
+                                      SET [login] = @login, [email] = @email,
+                                          [password] = @password, [RoleId] = @RoleId
+                                      WHERE [Id] = @Id";
+                            SqlCommand cmd = new SqlCommand(update, connection, transaction);
+                            cmd.Parameters.AddWithValue("@Id", Convert.ToInt32(row["Id"]));
+                            cmd.Parameters.AddWithValue("@login", row["login"].ToString().Trim());
+                            cmd.Parameters.AddWithValue("@email", row["email"].ToString().Trim());
+                            cmd.Parameters.AddWithValue("@password", finalPassword);
+                            cmd.Parameters.AddWithValue("@RoleId", Convert.ToInt32(row["RoleId"]));
+
+                            cmd.ExecuteNonQuery();
+                        }
+                        else if (row.RowState == DataRowState.Deleted)
+                        {
+                            // Удаление пользователя
+                            int userId = Convert.ToInt32(row["Id", DataRowVersion.Original]);
+
+                            string deleteUsers = "DELETE FROM [User] WHERE [Id] = @Id";
+                            SqlCommand cmd = new SqlCommand(deleteUsers, connection, transaction);
+                            cmd.Parameters.AddWithValue("@Id", userId);
+                            cmd.ExecuteNonQuery();
+                        }
                     }
-                    else if (row.RowState == DataRowState.Modified)
-                    {
-                        // Обновление пользователя
-                        string update = @"UPDATE [User]
-                                  SET [login] = @login, [email] = @email,
-                                      [password] = @password, [RoleId] = @RoleId
-                                  WHERE [Id] = @Id";
-                        SqlCommand cmd = new SqlCommand(update, connection);
-                        cmd.Parameters.AddWithValue("@Id", Convert.ToInt32(row["Id"]));
-                        cmd.Parameters.AddWithValue("@login", row["login"].ToString().Trim());
-                        cmd.Parameters.AddWithValue("@email", row["email"].ToString().Trim());
-                        cmd.Parameters.AddWithValue("@password", row["password"].ToString().Trim());
-                        cmd.Parameters.AddWithValue("@RoleId", Convert.ToInt32(row["RoleId"]));
-                        
 
-                        cmd.ExecuteNonQuery();
-                    }
-                    else if (row.RowState == DataRowState.Deleted)
-                    {
-                        // Удаление пользователя
-                        int roomId = Convert.ToInt32(row["Id", DataRowVersion.Original]);
-
-                        string deleteUsers = "DELETE FROM [User] WHERE [Id] = @Id";
-                        SqlCommand cmd = new SqlCommand(deleteUsers, connection);
-                        cmd.Parameters.AddWithValue("@Id", roomId);
-                        cmd.ExecuteNonQuery();
-
-                        
-                    }
+                    transaction.Commit();
+                    userTable.AcceptChanges();
+                    MessageBox.Show("Все изменения сохранены!", "Успех",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LoadUsers();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    MessageBox.Show($"Ошибка при сохранении: {ex.Message}", "Ошибка",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-
-            userTable.AcceptChanges();
-            MessageBox.Show("Все изменения сохранены!", "Успех",
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
-            LoadUsers();
         }
 
         private void deleteuser_bt_Click(object sender, EventArgs e)

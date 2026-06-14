@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.SqlClient;
 using BCrypt.Net;
+using System.Security.Cryptography;
 
 namespace BookingConferenceRoomss
 {
@@ -38,14 +39,12 @@ namespace BookingConferenceRoomss
                 return;
             }
 
-            // 2. Проверка совпадения паролей
             if (password != repeatPassword)
             {
                 MessageBox.Show("Пароли должны совпадать!", "Ошибка валидации", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            // 4. РАБОТА С БАЗОЙ ДАННЫХ
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 try
@@ -66,7 +65,7 @@ namespace BookingConferenceRoomss
                         }
                     }
 
-                    // Получаем следующий Id
+                    // Получаем следующий Id (максимальный Id + 1)
                     int nextId;
                     string idQuery = "SELECT ISNULL(MAX(Id), 0) + 1 FROM [User]";
                     using (SqlCommand idCmd = new SqlCommand(idQuery, connection))
@@ -74,10 +73,10 @@ namespace BookingConferenceRoomss
                         nextId = (int)idCmd.ExecuteScalar();
                     }
 
-                    // Хэшируем очищенный от пробелов пароль
+                    // Хэшируем пароль
                     string securePasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
 
-                    // Вставляем пользователя (RoleId = 2 — обычный пользователь)
+                    // Вставляем пользователя с ручным указанием Id
                     string insertQuery = "INSERT INTO [User] ([Id], [login], [email], [password], [RoleId]) VALUES (@id, @login, @email, @password, 2)";
                     using (SqlCommand insertCmd = new SqlCommand(insertQuery, connection))
                     {
@@ -90,7 +89,9 @@ namespace BookingConferenceRoomss
 
                     MessageBox.Show("Регистрация успешно завершена!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                    // Просто закрываем форму. Наша Form1 сама поймет это и покажется на экране!
+
+                    Form1 form1 = new Form1();
+                    form1.Show();
                     this.Close();
                 }
                 catch (SqlException sqlEx)
@@ -107,10 +108,13 @@ namespace BookingConferenceRoomss
                     MessageBox.Show($"Критическая ошибка: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-        } 
+        }
         private void Back_bt_Click(object sender, EventArgs e)
         {
+            Form1 form1 = new Form1();
+            form1.Show();
             this.Close();
+
         }
 
         private void RegistrationForm_FormClosed(object sender, FormClosedEventArgs e) { }
