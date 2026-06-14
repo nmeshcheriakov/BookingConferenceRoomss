@@ -69,7 +69,9 @@ namespace BookingConferenceRoomss
                 {
                     if (form is Form1)
                     {
-                        form.Show();
+                        Form1 loginForm = (Form1)form;
+                        loginForm.ClearFields(); 
+                        loginForm.Show();
                         break;
                     }
                 }

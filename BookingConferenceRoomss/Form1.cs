@@ -22,6 +22,7 @@ namespace BookingConferenceRoomss
         {
             InitializeComponent();
             
+            
         } 
 
         private void Form1_Load(object sender, EventArgs e) { }
@@ -96,5 +97,12 @@ namespace BookingConferenceRoomss
             regForm.Show();
             this.Hide();
         }
+        public void ClearFields()
+        {
+            log_tb.Text = "";
+            password_tb.Text = "";
+        }
+
+        
     }
 }
