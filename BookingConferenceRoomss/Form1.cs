@@ -103,6 +103,9 @@ namespace BookingConferenceRoomss
             password_tb.Text = "";
         }
 
-        
+        private void log_tb_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

@@ -57,6 +57,7 @@ namespace BookingConferenceRoomss
             this.log_tb.Name = "log_tb";
             this.log_tb.Size = new System.Drawing.Size(215, 32);
             this.log_tb.TabIndex = 1;
+            this.log_tb.TextChanged += new System.EventHandler(this.log_tb_TextChanged);
             // 
             // password_tb
             // 

@@ -52,7 +52,6 @@ namespace BookingConferenceRoomss
                 {
                     connection.Open();
 
-                    // Проверка существования логина
                     string checkQuery = "SELECT COUNT(*) FROM [User] WHERE [login] = @login";
                     using (SqlCommand checkCmd = new SqlCommand(checkQuery, connection))
                     {
@@ -66,7 +65,6 @@ namespace BookingConferenceRoomss
                         }
                     }
 
-                    // Получаем следующий Id (максимальный Id + 1)
                     int nextId;
                     string idQuery = "SELECT ISNULL(MAX(Id), 0) + 1 FROM [User]";
                     using (SqlCommand idCmd = new SqlCommand(idQuery, connection))
@@ -77,7 +75,6 @@ namespace BookingConferenceRoomss
                     // Хэшируем пароль
                     string securePasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
 
-                    // Вставляем пользователя с ручным указанием Id
                     string insertQuery = "INSERT INTO [User] ([Id], [login], [email], [password], [RoleId]) VALUES (@id, @login, @email, @password, 2)";
                     using (SqlCommand insertCmd = new SqlCommand(insertQuery, connection))
                     {

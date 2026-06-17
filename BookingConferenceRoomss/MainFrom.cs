@@ -47,7 +47,6 @@ namespace BookingConferenceRoomss
             guest.Minimum = 1;
             guest.Value = 1;
 
-            // Сразу отображаем залы при открытии формы
             LoadAvailableRooms();
 
         }
@@ -63,7 +62,6 @@ namespace BookingConferenceRoomss
                 {
                     connection.Open();
 
-                    // Выбираем только те залы, вместимость которых больше или равна числу гостей
                     string query = @"SELECT [Id] as 'Номер зала', 
                                             [Name] as 'Название зала', 
                                             [Capacity] as 'Вместимость (чел.)', 
@@ -79,10 +77,9 @@ namespace BookingConferenceRoomss
                                         AND B.[CheckOut] > @start
                                      )";
 
-                    // Если в строке поиска что-то написано — добавляем условие LIKE
                     if (!string.IsNullOrWhiteSpace(search_tb.Text))
                     {
-                        query += " AND [Name] LIKE @search";
+                        query += " AND ([Name] LIKE @search OR [description] LIKE @search)";
                     }
 
                     using (SqlCommand cmd = new SqlCommand(query, connection))
@@ -100,8 +97,21 @@ namespace BookingConferenceRoomss
                         DataTable dt = new DataTable();
                         adapter.Fill(dt);
 
-                        // Закидываем результат в DataGridView
                         dgv.DataSource = dt;
+
+                        if (dgv.Columns["image"] is DataGridViewImageColumn imageCol)
+                        {
+                            imageCol.ImageLayout = DataGridViewImageCellLayout.Zoom;
+                            imageCol.HeaderText = "Фото зала";
+                        }
+
+                        dgv.RowTemplate.Height = 110;
+                        foreach (DataGridViewRow row in dgv.Rows)
+                        {
+                            row.Height = 110;
+                        }
+
+                        dgv.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
                     }
                 }
                 catch (Exception ex)
@@ -133,11 +143,9 @@ namespace BookingConferenceRoomss
                 {
                     connection.Open();
 
-                    // Автоматически вычисляем следующий свободный ID для таблицы Booking
                     SqlCommand idCmd = new SqlCommand("SELECT ISNULL(MAX(Id), 0) + 1 FROM [Booking]", connection);
                     int newBookingId = (int)idCmd.ExecuteScalar();
 
-                    // Вставляем новую запись (StatusId = 1 — 'Подтверждено')
                     string insertQuery = @"INSERT INTO [Booking] ([Id], [CheckIn], [CheckOut], [Guests], [UserId], [ConferenceRoomId], [StatusId]) 
                                            VALUES (@id, @checkIn, @checkOut, @guests, @userId, @roomId, 1)";
 
@@ -155,7 +163,6 @@ namespace BookingConferenceRoomss
 
                     MessageBox.Show("Зал успешно забронирован на ваше имя!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                    // Обновляем список, чтобы сбросить состояние экрана
                     LoadAvailableRooms();
                 }
                 catch (Exception ex)
@@ -187,7 +194,7 @@ namespace BookingConferenceRoomss
                     if (form is Form1)
                     {
                         Form1 loginForm = (Form1)form;
-                        loginForm.ClearFields(); // Очищаем поля
+                        loginForm.ClearFields();
                         loginForm.Show();
                         break;
                     }
