@@ -33,7 +33,6 @@ namespace BookingConferenceRoomss
                 {
                     connection.Open();
 
-                    
                     string query = @"SELECT 
                                 b.[Id] as 'ID',
                                 u.[login] as 'Пользователь',
@@ -41,7 +40,6 @@ namespace BookingConferenceRoomss
                                 b.[CheckIn] as 'Начало',
                                 b.[CheckOut] as 'Конец',
                                 b.[Guests] as 'Гости',
-                                s.[Name] as 'Статус',
                                 b.[StatusId] as 'StatusId'
                             FROM [Booking] b
                             JOIN [User] u ON b.[UserId] = u.[Id]
@@ -56,7 +54,7 @@ namespace BookingConferenceRoomss
 
                 dataGridViewBookings.Columns.Clear();
 
-                //ID
+                // ID
                 DataGridViewTextBoxColumn colId = new DataGridViewTextBoxColumn
                 {
                     DataPropertyName = "ID",
@@ -66,7 +64,7 @@ namespace BookingConferenceRoomss
                 };
                 dataGridViewBookings.Columns.Add(colId);
 
-                //пользователь
+                // Пользователь
                 DataGridViewTextBoxColumn colUser = new DataGridViewTextBoxColumn
                 {
                     DataPropertyName = "Пользователь",
@@ -76,7 +74,7 @@ namespace BookingConferenceRoomss
                 };
                 dataGridViewBookings.Columns.Add(colUser);
 
-                //зал
+                // Зал
                 DataGridViewTextBoxColumn colRoom = new DataGridViewTextBoxColumn
                 {
                     DataPropertyName = "Зал",
@@ -86,7 +84,7 @@ namespace BookingConferenceRoomss
                 };
                 dataGridViewBookings.Columns.Add(colRoom);
 
-                //начало
+                // Начало
                 DataGridViewTextBoxColumn colStart = new DataGridViewTextBoxColumn
                 {
                     DataPropertyName = "Начало",
@@ -96,7 +94,7 @@ namespace BookingConferenceRoomss
                 };
                 dataGridViewBookings.Columns.Add(colStart);
 
-                //конец
+                // Конец
                 DataGridViewTextBoxColumn colEnd = new DataGridViewTextBoxColumn
                 {
                     DataPropertyName = "Конец",
@@ -106,7 +104,7 @@ namespace BookingConferenceRoomss
                 };
                 dataGridViewBookings.Columns.Add(colEnd);
 
-                //гости
+                // Гости
                 DataGridViewTextBoxColumn colGuests = new DataGridViewTextBoxColumn
                 {
                     DataPropertyName = "Гости",
@@ -116,7 +114,7 @@ namespace BookingConferenceRoomss
                 };
                 dataGridViewBookings.Columns.Add(colGuests);
 
-                //статус 
+                // Статус 
                 DataGridViewComboBoxColumn colStatus = new DataGridViewComboBoxColumn
                 {
                     DataPropertyName = "StatusId",
@@ -128,23 +126,11 @@ namespace BookingConferenceRoomss
                 };
                 dataGridViewBookings.Columns.Add(colStatus);
 
-                // Скрытая колонка для хранения StatusId
-                DataGridViewTextBoxColumn colStatusId = new DataGridViewTextBoxColumn
-                {
-                    DataPropertyName = "StatusId",
-                    HeaderText = "StatusId",
-                    Visible = false
-                };
-                dataGridViewBookings.Columns.Add(colStatusId);
-
                 dataGridViewBookings.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
                 dataGridViewBookings.RowTemplate.Height = 40;
                 dataGridViewBookings.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
                 dataGridViewBookings.MultiSelect = false;
                 dataGridViewBookings.DataSource = bookingTable;
-
-                // Раскрашиваем строки по статусам
-                dataGridViewBookings.CellFormatting += DataGridViewBookings_CellFormatting;
             }
             catch (Exception ex)
             {
@@ -166,59 +152,8 @@ namespace BookingConferenceRoomss
             return statusTable;
         }
 
-        private void DataGridViewBookings_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
-        {
-            
-            if (e.ColumnIndex == 6 && e.Value != null)
-            {
-                try
-                {
-                    int statusId = Convert.ToInt32(e.Value);
-                    string statusName = GetStatusName(statusId);
-
-                    if (!string.IsNullOrEmpty(statusName))
-                    {
-                        e.Value = statusName;
-                        e.FormattingApplied = true;
-
-                        DataGridViewRow row = dataGridViewBookings.Rows[e.RowIndex];
-                        switch (statusId)
-                        {
-                            case 1: //активна
-                                row.DefaultCellStyle.BackColor = Color.LightGreen;
-                                break;
-                            case 2: //отменена
-                                row.DefaultCellStyle.BackColor = Color.LightCoral;
-                                break;
-                            case 3: //завершена
-                                row.DefaultCellStyle.BackColor = Color.LightGray;
-                                break;
-                            default:
-                                row.DefaultCellStyle.BackColor = Color.White;
-                                break;
-                        }
-                    }
-                }
-                catch { }
-            }
-        }
-
-        private string GetStatusName(int statusId)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-                string query = "SELECT [Name] FROM [StatusBooking] WHERE [Id] = @Id";
-                SqlCommand cmd = new SqlCommand(query, connection);
-                cmd.Parameters.AddWithValue("@Id", statusId);
-                object result = cmd.ExecuteScalar();
-                return result?.ToString() ?? "";
-            }
-        }
-
         private void save_bt_Click(object sender, EventArgs e)
         {
-            // Проверка изменений
             bool hasChanges = false;
             foreach (DataRow row in bookingTable.Rows)
             {
@@ -285,10 +220,7 @@ namespace BookingConferenceRoomss
             {
                 Application.Exit();
             }
-
             
         }
-
-        
     }
 }
