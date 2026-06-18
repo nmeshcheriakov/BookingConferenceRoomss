@@ -72,7 +72,7 @@ namespace BookingConferenceRoomss
                         nextId = (int)idCmd.ExecuteScalar();
                     }
 
-                    // Хэшируем пароль
+                    //хэш пароля
                     string securePasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
 
                     string insertQuery = "INSERT INTO [User] ([Id], [login], [email], [password], [RoleId]) VALUES (@id, @login, @email, @password, 2)";

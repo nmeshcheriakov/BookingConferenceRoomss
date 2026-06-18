@@ -105,14 +105,14 @@ namespace BookingConferenceRooms
                         "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
-                // Проверяем наличие файлов
+                
                 string[] imageFiles = new string[] { "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg" };
                 foreach (string file in imageFiles)
                 {
                     string fullPath = Path.Combine(basePath, file);
                     if (!File.Exists(fullPath))
                     {
-                        // Создаем заглушку - белый квадрат 200x200
+                        
                         CreateDummyImage(fullPath);
                     }
                 }

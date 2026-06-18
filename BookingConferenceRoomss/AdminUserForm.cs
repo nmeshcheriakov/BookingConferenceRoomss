@@ -199,12 +199,12 @@ namespace BookingConferenceRoomss
 
                             if (oldPassword != newPassword)
                             {
-                                // Пароль изменился - хэшируем новый
+                                
                                 finalPassword = BCrypt.Net.BCrypt.HashPassword(newPassword);
                             }
                             else
                             {
-                                // Пароль не изменился - оставляем как есть (это уже хэш)
+                                
                                 finalPassword = newPassword;
                             }
 

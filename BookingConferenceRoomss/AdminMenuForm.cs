@@ -57,14 +57,14 @@ namespace BookingConferenceRoomss
         }
         private void AdminMenuForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            // Если закрыли не через кнопку "Назад" - закрываем всё приложение
+            
             if (!isBackButtonClicked)
             {
                 Application.Exit();
             }
             else
             {
-                // Если через кнопку "Назад" - показываем форму авторизации
+                
                 foreach (Form form in Application.OpenForms)
                 {
                     if (form is Form1)
