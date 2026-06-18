@@ -63,7 +63,7 @@
             this.users_bt.Name = "users_bt";
             this.users_bt.Size = new System.Drawing.Size(213, 25);
             this.users_bt.TabIndex = 2;
-            this.users_bt.Text = "Управление поьзователями";
+            this.users_bt.Text = "Управление пользователями";
             this.users_bt.UseVisualStyleBackColor = true;
             this.users_bt.Click += new System.EventHandler(this.users_bt_Click);
             // 
