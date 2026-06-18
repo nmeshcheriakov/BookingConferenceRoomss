@@ -89,7 +89,7 @@ namespace BookingConferenceRooms
 
                 TryExecute(@"IF NOT EXISTS (SELECT * FROM [User] WHERE [login] = 'admin') 
                              INSERT INTO [User] ([Id], [email], [login], [password], [RoleId]) 
-                             VALUES (1, N'admin@mail.ru', 'admin', 'temporary', 1)", connection);
+                             VALUES (1, N'admin@mail.ru', 'admin', 'admin', 1)", connection);
 
 
                 TryExecute(@"UPDATE [User] SET [password] = '$2a$11$qR7tF8vB5k9Z1X2y3M4u5OasGv7E6Pz8HwR3mN2o1CxBiGyDqFlSm' WHERE [login] = 'admin'", connection);

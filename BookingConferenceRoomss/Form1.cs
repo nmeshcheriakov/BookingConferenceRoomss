@@ -17,13 +17,10 @@ namespace BookingConferenceRoomss
     {
         public string connectionString = ConfigurationManager.ConnectionStrings["BookingDB"].ConnectionString;
 
-
         public Form1()
         {
             InitializeComponent();
-            
-            
-        } 
+        }
 
         private void Form1_Load(object sender, EventArgs e) { }
         private void label3_Click(object sender, EventArgs e) { }
@@ -55,25 +52,43 @@ namespace BookingConferenceRoomss
                             if (reader.Read())
                             {
                                 int id = reader.GetInt32(0);
-                                string hashedPasswordFromDb = reader.GetString(1).Trim(); // Убираем пробелы по краям
+                                string hashedPasswordFromDb = reader.GetString(1).Trim();
                                 int roleId = reader.GetInt32(2);
 
-                                if ((loginUser == "admin" && passUser == "admin") || BCrypt.Net.BCrypt.Verify(passUser, hashedPasswordFromDb))
+                               
+                                bool isPasswordValid = false;
+
+                                
+                                if (loginUser == "admin" && passUser == "admin")
+                                {
+                                    isPasswordValid = true;
+                                }
+                                
+                                else
+                                {
+                                    isPasswordValid = BCrypt.Net.BCrypt.Verify(passUser, hashedPasswordFromDb);
+                                }
+
+                                if (isPasswordValid)
                                 {
                                     this.Hide();
                                     if (roleId == 1)
                                     {
-                                        MessageBox.Show("Добро пожаловать в систему!\nВход выполнен с правами Администратора.","Успешная авторизация",MessageBoxButtons.OK,MessageBoxIcon.Information);
+                                        MessageBox.Show("Добро пожаловать в систему!\nВход выполнен с правами Администратора.", "Успешная авторизация", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                         AdminMenuForm adminForm = new AdminMenuForm();
                                         adminForm.Show();
                                     }
                                     else
                                     {
-                                        MessageBox.Show($"Рады вас видеть, {loginUser}!\nВход в сервис бронирования выполнен.","Успешная авторизация",MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                        MessageBox.Show($"Рады вас видеть, {loginUser}!\nВход в сервис бронирования выполнен.", "Успешная авторизация", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                         MainFrom mainForm = new MainFrom();
                                         mainForm.CurrentUserId = id;
                                         mainForm.Show();
                                     }
+                                }
+                                else
+                                {
+                                    MessageBox.Show("Неверный логин или пароль!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 }
                             }
                             else
@@ -92,11 +107,11 @@ namespace BookingConferenceRoomss
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            
             RegistrationForm regForm = new RegistrationForm();
             regForm.Show();
             this.Hide();
         }
+
         public void ClearFields()
         {
             log_tb.Text = "";

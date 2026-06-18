@@ -32,6 +32,7 @@
             this.rooms_bt = new System.Windows.Forms.Button();
             this.users_bt = new System.Windows.Forms.Button();
             this.Back = new System.Windows.Forms.Button();
+            this.bookings_bt = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -78,12 +79,24 @@
             this.Back.UseVisualStyleBackColor = true;
             this.Back.Click += new System.EventHandler(this.Back_Click);
             // 
+            // bookings_bt
+            // 
+            this.bookings_bt.Font = new System.Drawing.Font("Times New Roman", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.bookings_bt.Location = new System.Drawing.Point(5, 45);
+            this.bookings_bt.Name = "bookings_bt";
+            this.bookings_bt.Size = new System.Drawing.Size(213, 23);
+            this.bookings_bt.TabIndex = 4;
+            this.bookings_bt.Text = "Управление бронью";
+            this.bookings_bt.UseVisualStyleBackColor = true;
+            this.bookings_bt.Click += new System.EventHandler(this.bookings_bt_Click);
+            // 
             // AdminMenuForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.ClientSize = new System.Drawing.Size(334, 195);
+            this.Controls.Add(this.bookings_bt);
             this.Controls.Add(this.Back);
             this.Controls.Add(this.users_bt);
             this.Controls.Add(this.rooms_bt);
@@ -107,5 +120,6 @@
         private System.Windows.Forms.Button rooms_bt;
         private System.Windows.Forms.Button users_bt;
         private System.Windows.Forms.Button Back;
+        private System.Windows.Forms.Button bookings_bt;
     }
 }

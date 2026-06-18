@@ -106,6 +106,12 @@
     <Compile Include="AdminUserForm.Designer.cs">
       <DependentUpon>AdminUserForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="AdminBookingForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AdminBookingForm.Designer.cs">
+      <DependentUpon>AdminBookingForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainFrom.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -120,6 +126,9 @@
     <Compile Include="RegistrationForm.Designer.cs">
       <DependentUpon>RegistrationForm.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="AdminBookingForm.resx">
+      <DependentUpon>AdminBookingForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="AdminForm.resx">
       <DependentUpon>AdminForm.cs</DependentUpon>
     </EmbeddedResource>

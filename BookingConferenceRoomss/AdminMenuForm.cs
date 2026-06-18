@@ -77,5 +77,13 @@ namespace BookingConferenceRoomss
                 }
             }
         }
+
+        private void bookings_bt_Click(object sender, EventArgs e)
+        {
+            AdminBookingForm bookingForm = new AdminBookingForm();
+            bookingForm.FormClosed += (s, args) => this.Show();
+            bookingForm.Show();
+            this.Hide();
+        }
     }
 }

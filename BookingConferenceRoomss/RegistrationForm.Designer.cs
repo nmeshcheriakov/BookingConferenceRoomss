@@ -85,7 +85,7 @@
             this.reg_bt.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.reg_bt.Location = new System.Drawing.Point(581, 421);
             this.reg_bt.Name = "reg_bt";
-            this.reg_bt.Size = new System.Drawing.Size(175, 38);
+            this.reg_bt.Size = new System.Drawing.Size(175, 37);
             this.reg_bt.TabIndex = 4;
             this.reg_bt.Text = "Зарегистрироваться";
             this.reg_bt.UseVisualStyleBackColor = true;
@@ -148,9 +148,9 @@
             // Back_bt
             // 
             this.Back_bt.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.Back_bt.Location = new System.Drawing.Point(65, 428);
+            this.Back_bt.Location = new System.Drawing.Point(39, 421);
             this.Back_bt.Name = "Back_bt";
-            this.Back_bt.Size = new System.Drawing.Size(71, 31);
+            this.Back_bt.Size = new System.Drawing.Size(175, 37);
             this.Back_bt.TabIndex = 10;
             this.Back_bt.Text = "Назад";
             this.Back_bt.UseVisualStyleBackColor = true;
