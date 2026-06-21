@@ -27,6 +27,7 @@ namespace BookingConferenceRoomss
         {
             InitializeComponent();
             LoadRooms();
+            this.Activated += AdminForm_Activated;
             this.FormClosing += AdminForm_FormClosing;
             
 
@@ -129,6 +130,7 @@ namespace BookingConferenceRoomss
 
                
                 LoadImagesIntoGrid();
+                UpdateRoomLocks();
             }
             catch (Exception ex)
             {
@@ -148,9 +150,63 @@ namespace BookingConferenceRoomss
             return result;
         }
 
+
+       
+        private void UpdateRoomLocks()
+        {
+            
+            foreach (DataGridViewRow row in dataGridView1.Rows)
+            {
+                row.ReadOnly = false;
+                row.DefaultCellStyle.BackColor = Color.White;
+                row.DefaultCellStyle.ForeColor = Color.Black;
+                row.Cells[1].ToolTipText = "";
+            }
+
+            
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = @"SELECT DISTINCT [ConferenceRoomId] 
+                         FROM [Booking] 
+                         WHERE [StatusId] = 1";
+
+                SqlCommand cmd = new SqlCommand(query, connection);
+                List<int> lockedRoomIds = new List<int>();
+
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        lockedRoomIds.Add(reader.GetInt32(0));
+                    }
+                }
+
+                
+                foreach (DataGridViewRow row in dataGridView1.Rows)
+                {
+                    if (row.Cells[0].Value != null)
+                    {
+                        int roomId = Convert.ToInt32(row.Cells[0].Value);
+                        if (lockedRoomIds.Contains(roomId))
+                        {
+                            row.ReadOnly = true;
+                            row.DefaultCellStyle.BackColor = Color.LightGray;
+                            row.DefaultCellStyle.ForeColor = Color.DarkGray;
+                            row.Cells[1].ToolTipText = "Этот зал занят (есть активные бронирования). Редактирование запрещено!";
+                        }
+                    }
+                }
+            }
+        }
+
+        private void AdminForm_Activated(object sender, EventArgs e)
+        {
+            UpdateRoomLocks();
+        }
         private void LoadImagesIntoGrid()
         {
-            // Находим индекс колонки с фото по имени
+            
             int imageColumnIndex = -1;
             foreach (DataGridViewColumn col in dataGridView1.Columns)
             {
@@ -161,7 +217,7 @@ namespace BookingConferenceRoomss
                 }
             }
 
-            if (imageColumnIndex == -1) return; // Если колонка не найдена
+            if (imageColumnIndex == -1) return; 
 
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
@@ -176,7 +232,7 @@ namespace BookingConferenceRoomss
                             using (MemoryStream ms = new MemoryStream(imageBytes))
                             {
                                 Image original = Image.FromStream(ms);
-                                // Используем найденный индекс
+                                
                                 if (imageColumnIndex >= 0 && imageColumnIndex < row.Cells.Count)
                                 {
                                     row.Cells[imageColumnIndex].Value = ResizeImage(original, 160, 100);
@@ -256,18 +312,18 @@ namespace BookingConferenceRoomss
                 {
                     byte[] imageBytes = File.ReadAllBytes(openFileDialog.FileName);
 
-                    // Обновляем в DataTable
+                    
                     int rowIndex = dataGridView1.SelectedRows[0].Index;
                     roomsTable.Rows[rowIndex]["image"] = imageBytes;
 
-                    // Обновляем в DataGridView
+                    
                     using (MemoryStream ms = new MemoryStream(imageBytes))
                     {
                         Image original = Image.FromStream(ms);
                         dataGridView1.Rows[rowIndex].Cells[dataGridView1.Columns.Count - 1].Value = ResizeImage(original, 160, 100);
                     }
 
-                    // ===== ИСПРАВЛЕНИЕ: перезагружаем данные после сохранения =====
+                    
                     MessageBox.Show("Фото обновлено! Нажмите «Сохранить», чтобы применить изменения.",
                         "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -348,12 +404,11 @@ namespace BookingConferenceRoomss
                     }
                     else if (row.RowState == DataRowState.Modified || row.RowState == DataRowState.Unchanged)
                     {
-                        // ===== ИСПРАВЛЕНО: обрабатываем и Modified, и Unchanged =====
-                        // Для первого зала RowState может быть Unchanged, но фото могло измениться
+                        
 
                         int roomId = Convert.ToInt32(row["Id"]);
 
-                        // Получаем текущее фото из базы
+                        
                         string getImageQuery = "SELECT [image] FROM [ConferenceRooms] WHERE [Id] = @Id";
                         SqlCommand getImageCmd = new SqlCommand(getImageQuery, connection);
                         getImageCmd.Parameters.AddWithValue("@Id", roomId);
@@ -364,14 +419,14 @@ namespace BookingConferenceRoomss
                             oldImage = (byte[])oldImageObj;
                         }
 
-                        // Получаем новое фото из DataTable
+                        
                         byte[] newImage = null;
                         if (row["image"] != DBNull.Value && row["image"] != null)
                         {
                             newImage = (byte[])row["image"];
                         }
 
-                        // Проверяем, изменилось ли фото
+                        
                         bool imageChanged = false;
                         if (oldImage == null && newImage != null) imageChanged = true;
                         else if (oldImage != null && newImage == null) imageChanged = true;
@@ -380,7 +435,7 @@ namespace BookingConferenceRoomss
                             if (oldImage.Length != newImage.Length) imageChanged = true;
                         }
 
-                        // Если фото изменилось или есть другие изменения - сохраняем
+                        
                         if (imageChanged || row.RowState == DataRowState.Modified)
                         {
                             string update = @"UPDATE [ConferenceRooms]
@@ -408,7 +463,7 @@ namespace BookingConferenceRoomss
 
                             cmd.ExecuteNonQuery();
 
-                            // Помечаем строку как не измененную
+                            
                             row.AcceptChanges();
                         }
                     }
@@ -416,6 +471,23 @@ namespace BookingConferenceRoomss
                     {
                         // Удаление зала
                         int roomId = Convert.ToInt32(row["Id", DataRowVersion.Original]);
+
+                        
+                        string checkQuery = "SELECT COUNT(*) FROM [Booking] WHERE [ConferenceRoomId] = @RoomId AND [StatusId] = 1";
+                        SqlCommand checkCmd = new SqlCommand(checkQuery, connection);
+                        checkCmd.Parameters.AddWithValue("@RoomId", roomId);
+                        int activeBookings = (int)checkCmd.ExecuteScalar();
+
+                        if (activeBookings > 0)
+                        {
+                            
+                            row.RejectChanges();
+                            MessageBox.Show($"Невозможно удалить зал.\n" +
+                                            $"У зала есть {activeBookings} активных бронирований.\n" +
+                                            "Сначала завершите или отмените все активные бронирования.",
+                                            "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return;
+                        }
 
                         string deleteBookings = "DELETE FROM [Booking] WHERE [ConferenceRoomId] = @Id";
                         SqlCommand cmd = new SqlCommand(deleteBookings, connection);
@@ -434,6 +506,7 @@ namespace BookingConferenceRoomss
             MessageBox.Show("Все изменения сохранены!", "Успех",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
             LoadRooms();
+            UpdateRoomLocks();
         }
 
         private void deleteroom_bt_Click(object sender, EventArgs e)
@@ -447,9 +520,29 @@ namespace BookingConferenceRoomss
 
             DataGridViewRow selectedRow = dataGridView1.SelectedRows[0];
             string roomName = selectedRow.Cells[1].Value?.ToString() ?? "";
+            int roomId = Convert.ToInt32(selectedRow.Cells[0].Value);
+
+            
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string checkQuery = "SELECT COUNT(*) FROM [Booking] WHERE [ConferenceRoomId] = @RoomId AND [StatusId] = 1";
+                SqlCommand checkCmd = new SqlCommand(checkQuery, connection);
+                checkCmd.Parameters.AddWithValue("@RoomId", roomId);
+                int activeBookings = (int)checkCmd.ExecuteScalar();
+
+                if (activeBookings > 0)
+                {
+                    MessageBox.Show($"Невозможно удалить зал «{roomName}».\n" +
+                                    $"У зала есть {activeBookings} активных бронирований.\n" +
+                                    "Сначала завершите или отмените все активные бронирования.",
+                                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
 
             DialogResult result = MessageBox.Show(
-                $"Удалить зал «{roomName}»?\nНажмите «Сохранить», чтобы подтвердить.",
+                $"Удалить зал «{roomName}»?",
                 "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (result == DialogResult.Yes)
