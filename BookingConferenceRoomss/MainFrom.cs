@@ -25,8 +25,16 @@ namespace BookingConferenceRoomss
         public MainFrom()
         {
             InitializeComponent();
-            this.FormClosing += MainFrom_FormClosing;
+
+            groupBox1.Anchor = AnchorStyles.None;
+            groupBox2.Anchor = AnchorStyles.None;
+            bron_bt.Anchor = AnchorStyles.None;
+            dgv.Anchor = AnchorStyles.None;
+            back.Anchor = AnchorStyles.None;
+
+            this.Resize += MainFrom_Resize;
         }
+
 
         private void groupBox1_Enter(object sender, EventArgs e) { }
         private void dateTimePicker1_ValueChanged(object sender, EventArgs e) { }
@@ -48,7 +56,49 @@ namespace BookingConferenceRoomss
             guest.Value = 1;
 
             LoadAvailableRooms();
+        }
 
+        private void MainFrom_Resize(object sender, EventArgs e)
+        {
+            int margin = 12;
+
+            if (this.WindowState == FormWindowState.Maximized)
+            {
+                int totalWidth = this.ClientSize.Width - (margin * 3);
+                int halfWidth = totalWidth / 2;
+
+                groupBox1.Location = new Point(margin, margin);
+                groupBox1.Width = halfWidth;
+
+                groupBox2.Location = new Point(groupBox1.Right + margin, margin);
+                groupBox2.Width = halfWidth;
+
+                bron_bt.Location = new Point(margin, groupBox1.Bottom + margin);
+                bron_bt.Width = this.ClientSize.Width - (margin * 2);
+
+                back.Location = new Point(margin, this.ClientSize.Height - back.Height - margin);
+
+                dgv.Location = new Point(margin, bron_bt.Bottom + margin);
+                dgv.Width = this.ClientSize.Width - (margin * 2);
+                dgv.Height = back.Top - dgv.Top - margin;
+            }
+            else if (this.WindowState == FormWindowState.Normal)
+            {
+
+                groupBox1.Location = new Point(12, 12);
+                groupBox1.Size = new Size(400, 130);
+
+                groupBox2.Location = new Point(415, 12);
+                groupBox2.Size = new Size(390, 130);
+
+                bron_bt.Location = new Point(415, 150);
+                bron_bt.Size = new Size(390, 35);
+
+                dgv.Location = new Point(12, 200);
+                dgv.Size = new Size(790, 230);
+
+                back.Location = new Point(12, 440);
+            }
         }
         private void show_bt_Click(object sender, EventArgs e)
         {
@@ -206,6 +256,31 @@ namespace BookingConferenceRoomss
         {
             isBackButtonClicked = true;
             this.Close();
+        }
+
+        private void finish_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void guest_ValueChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
