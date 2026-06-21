@@ -35,23 +35,23 @@
             this.deleteroom_bt = new System.Windows.Forms.Button();
             this.save_bt = new System.Windows.Forms.Button();
             this.changeimage_bt = new System.Windows.Forms.Button();
-            this.pbPreview = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbPreview)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
+            this.label1.Dock = System.Windows.Forms.DockStyle.Top;
             this.label1.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label1.Location = new System.Drawing.Point(316, 10);
+            this.label1.Location = new System.Drawing.Point(0, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(278, 23);
+            this.label1.Size = new System.Drawing.Size(771, 23);
             this.label1.TabIndex = 0;
             this.label1.Text = "Управление конференц залами";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // back
             // 
+            this.back.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.back.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.back.Location = new System.Drawing.Point(12, 423);
             this.back.Name = "back";
@@ -65,6 +65,10 @@
             // 
             this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.AllowUserToDeleteRows = false;
+            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Location = new System.Drawing.Point(12, 67);
             this.dataGridView1.MultiSelect = false;
@@ -77,6 +81,7 @@
             // 
             // addroom_bt
             // 
+            this.addroom_bt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.addroom_bt.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.addroom_bt.Location = new System.Drawing.Point(320, 423);
             this.addroom_bt.Name = "addroom_bt";
@@ -88,6 +93,7 @@
             // 
             // deleteroom_bt
             // 
+            this.deleteroom_bt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.deleteroom_bt.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.deleteroom_bt.Location = new System.Drawing.Point(616, 423);
             this.deleteroom_bt.Name = "deleteroom_bt";
@@ -99,6 +105,7 @@
             // 
             // save_bt
             // 
+            this.save_bt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.save_bt.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.save_bt.Location = new System.Drawing.Point(468, 423);
             this.save_bt.Name = "save_bt";
@@ -110,6 +117,7 @@
             // 
             // changeimage_bt
             // 
+            this.changeimage_bt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.changeimage_bt.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.changeimage_bt.Location = new System.Drawing.Point(160, 423);
             this.changeimage_bt.Name = "changeimage_bt";
@@ -119,23 +127,12 @@
             this.changeimage_bt.UseVisualStyleBackColor = true;
             this.changeimage_bt.Click += new System.EventHandler(this.changeimage_bt_Click);
             // 
-            // pbPreview
-            // 
-            this.pbPreview.Location = new System.Drawing.Point(766, 67);
-            this.pbPreview.Name = "pbPreview";
-            this.pbPreview.Size = new System.Drawing.Size(179, 336);
-            this.pbPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pbPreview.TabIndex = 7;
-            this.pbPreview.TabStop = false;
-            this.pbPreview.Click += new System.EventHandler(this.pictureBox1_Click);
-            // 
             // AdminForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.ClientSize = new System.Drawing.Size(947, 470);
-            this.Controls.Add(this.pbPreview);
+            this.ClientSize = new System.Drawing.Size(771, 470);
             this.Controls.Add(this.changeimage_bt);
             this.Controls.Add(this.save_bt);
             this.Controls.Add(this.deleteroom_bt);
@@ -148,9 +145,7 @@
             this.Text = "Управление залами";
             this.Load += new System.EventHandler(this.AdminForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbPreview)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -163,6 +158,5 @@
         private System.Windows.Forms.Button deleteroom_bt;
         private System.Windows.Forms.Button save_bt;
         private System.Windows.Forms.Button changeimage_bt;
-        private System.Windows.Forms.PictureBox pbPreview;
     }
 }

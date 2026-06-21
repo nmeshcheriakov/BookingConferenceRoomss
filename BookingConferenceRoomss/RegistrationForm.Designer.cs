@@ -43,6 +43,7 @@
             // 
             // label1
             // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Times New Roman", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.label1.Location = new System.Drawing.Point(243, 46);
@@ -54,6 +55,7 @@
             // 
             // log_tb
             // 
+            this.log_tb.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.log_tb.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.log_tb.Location = new System.Drawing.Point(253, 144);
             this.log_tb.Name = "log_tb";
@@ -63,6 +65,7 @@
             // 
             // password_tb
             // 
+            this.password_tb.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.password_tb.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.password_tb.Location = new System.Drawing.Point(253, 298);
             this.password_tb.Name = "password_tb";
@@ -73,6 +76,7 @@
             // 
             // email_tb
             // 
+            this.email_tb.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.email_tb.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.email_tb.Location = new System.Drawing.Point(253, 223);
             this.email_tb.Name = "email_tb";
@@ -82,6 +86,7 @@
             // 
             // reg_bt
             // 
+            this.reg_bt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.reg_bt.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.reg_bt.Location = new System.Drawing.Point(581, 421);
             this.reg_bt.Name = "reg_bt";
@@ -93,6 +98,7 @@
             // 
             // label2
             // 
+            this.label2.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.label2.Location = new System.Drawing.Point(249, 116);
@@ -104,6 +110,7 @@
             // 
             // label3
             // 
+            this.label3.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.label3.Location = new System.Drawing.Point(253, 195);
@@ -115,6 +122,7 @@
             // 
             // label4
             // 
+            this.label4.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.label4.Location = new System.Drawing.Point(253, 270);
@@ -126,6 +134,7 @@
             // 
             // label5
             // 
+            this.label5.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.label5.Location = new System.Drawing.Point(253, 349);
@@ -137,6 +146,7 @@
             // 
             // repeat_password_tb
             // 
+            this.repeat_password_tb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
             this.repeat_password_tb.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.repeat_password_tb.Location = new System.Drawing.Point(253, 377);
             this.repeat_password_tb.Name = "repeat_password_tb";
@@ -147,6 +157,7 @@
             // 
             // Back_bt
             // 
+            this.Back_bt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.Back_bt.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.Back_bt.Location = new System.Drawing.Point(39, 421);
             this.Back_bt.Name = "Back_bt";

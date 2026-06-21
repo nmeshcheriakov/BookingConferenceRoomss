@@ -27,6 +27,9 @@
             // 
             // dataGridViewBookings
             // 
+            this.dataGridViewBookings.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridViewBookings.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewBookings.Location = new System.Drawing.Point(11, 57);
             this.dataGridViewBookings.Margin = new System.Windows.Forms.Padding(2);
@@ -36,6 +39,7 @@
             // 
             // save_bt
             // 
+            this.save_bt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.save_bt.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.save_bt.Location = new System.Drawing.Point(607, 397);
             this.save_bt.Margin = new System.Windows.Forms.Padding(2);
@@ -48,6 +52,7 @@
             // 
             // back
             // 
+            this.back.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.back.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.back.Location = new System.Drawing.Point(11, 397);
             this.back.Margin = new System.Windows.Forms.Padding(2);
@@ -60,13 +65,14 @@
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
+            this.label1.Dock = System.Windows.Forms.DockStyle.Top;
             this.label1.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label1.Location = new System.Drawing.Point(263, 10);
+            this.label1.Location = new System.Drawing.Point(0, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(187, 23);
+            this.label1.Size = new System.Drawing.Size(738, 30);
             this.label1.TabIndex = 3;
             this.label1.Text = "Управление бронью";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // AdminBookingForm
             // 
@@ -82,9 +88,9 @@
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "AdminBookingForm";
             this.Text = "Управление бронированиями";
+            this.Load += new System.EventHandler(this.AdminBookingForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewBookings)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 

@@ -23,6 +23,7 @@ namespace BookingConferenceRoomss
             InitializeComponent();
             LoadBookings();
             this.FormClosing += AdminBookingForm_FormClosing;
+            
         }
 
         private void LoadBookings()
@@ -221,6 +222,11 @@ namespace BookingConferenceRoomss
                 Application.Exit();
             }
             
+        }
+
+        private void AdminBookingForm_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

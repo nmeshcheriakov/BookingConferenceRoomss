@@ -39,17 +39,19 @@
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
+            this.label1.Dock = System.Windows.Forms.DockStyle.Top;
             this.label1.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label1.Location = new System.Drawing.Point(238, 19);
+            this.label1.Location = new System.Drawing.Point(0, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(259, 23);
+            this.label1.Size = new System.Drawing.Size(800, 23);
             this.label1.TabIndex = 8;
             this.label1.Text = "Управление пользователями";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // back
             // 
+            this.back.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.back.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.back.Location = new System.Drawing.Point(22, 417);
             this.back.Name = "back";
@@ -63,6 +65,10 @@
             // 
             this.dataGridViewuser.AllowUserToAddRows = false;
             this.dataGridViewuser.AllowUserToDeleteRows = false;
+            this.dataGridViewuser.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataGridViewuser.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dataGridViewuser.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewuser.Location = new System.Drawing.Point(22, 75);
             this.dataGridViewuser.MultiSelect = false;
@@ -73,6 +79,7 @@
             // 
             // adduser_bt
             // 
+            this.adduser_bt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.adduser_bt.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.adduser_bt.Location = new System.Drawing.Point(170, 417);
             this.adduser_bt.Name = "adduser_bt";
@@ -84,6 +91,7 @@
             // 
             // deleteuser_bt
             // 
+            this.deleteuser_bt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.deleteuser_bt.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.deleteuser_bt.Location = new System.Drawing.Point(466, 417);
             this.deleteuser_bt.Name = "deleteuser_bt";
@@ -95,6 +103,7 @@
             // 
             // save_bt
             // 
+            this.save_bt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.save_bt.Font = new System.Drawing.Font("Times New Roman", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.save_bt.Location = new System.Drawing.Point(318, 417);
             this.save_bt.Name = "save_bt";
@@ -122,7 +131,6 @@
             this.Load += new System.EventHandler(this.AdminUserForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewuser)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
