@@ -346,95 +346,56 @@ namespace BookingConferenceRoomss
 
                         cmd.ExecuteNonQuery();
                     }
-                    else if (row.RowState == DataRowState.Modified)
+                    else if (row.RowState == DataRowState.Modified || row.RowState == DataRowState.Unchanged)
                     {
+                        // ===== ИСПРАВЛЕНО: обрабатываем и Modified, и Unchanged =====
+                        // Для первого зала RowState может быть Unchanged, но фото могло измениться
+
                         int roomId = Convert.ToInt32(row["Id"]);
-                        string roomName = row["Name"].ToString().Trim();
 
-                        // Получаем старые значения из базы
-                        string getOriginalQuery = "SELECT [Name], [Capacity], [description], [image] FROM [ConferenceRooms] WHERE [Id] = @Id";
-                        SqlCommand getOriginalCmd = new SqlCommand(getOriginalQuery, connection);
-                        getOriginalCmd.Parameters.AddWithValue("@Id", roomId);
-
-                        string oldName = "";
-                        int oldCapacity = 0;
-                        string oldDescription = "";
+                        // Получаем текущее фото из базы
+                        string getImageQuery = "SELECT [image] FROM [ConferenceRooms] WHERE [Id] = @Id";
+                        SqlCommand getImageCmd = new SqlCommand(getImageQuery, connection);
+                        getImageCmd.Parameters.AddWithValue("@Id", roomId);
+                        object oldImageObj = getImageCmd.ExecuteScalar();
                         byte[] oldImage = null;
-
-                        using (SqlDataReader reader = getOriginalCmd.ExecuteReader())
+                        if (oldImageObj != DBNull.Value && oldImageObj != null)
                         {
-                            if (reader.Read())
-                            {
-                                oldName = reader["Name"].ToString().Trim();
-                                oldCapacity = Convert.ToInt32(reader["Capacity"]);
-                                oldDescription = reader["description"]?.ToString().Trim() ?? "";
-
-                                if (reader["image"] != DBNull.Value && reader["image"] != null)
-                                {
-                                    oldImage = (byte[])reader["image"];
-                                }
-                            }
+                            oldImage = (byte[])oldImageObj;
                         }
 
-                        string newName = row["Name"].ToString().Trim();
-                        int newCapacity = Convert.ToInt32(row["Capacity"]);
-                        string newDescription = row["description"]?.ToString().Trim() ?? "";
+                        // Получаем новое фото из DataTable
                         byte[] newImage = null;
-
                         if (row["image"] != DBNull.Value && row["image"] != null)
                         {
                             newImage = (byte[])row["image"];
                         }
 
-                        // ===== ИСПРАВЛЕНО: проверяем все изменения, включая фото =====
-                        bool isDataChanged = (oldName != newName) ||
-                                             (oldCapacity != newCapacity) ||
-                                             (oldDescription != newDescription);
-
                         // Проверяем, изменилось ли фото
-                        bool isImageChanged = false;
-                        if (oldImage == null && newImage != null) isImageChanged = true;
-                        else if (oldImage != null && newImage == null) isImageChanged = true;
+                        bool imageChanged = false;
+                        if (oldImage == null && newImage != null) imageChanged = true;
+                        else if (oldImage != null && newImage == null) imageChanged = true;
                         else if (oldImage != null && newImage != null)
                         {
-                            if (oldImage.Length != newImage.Length) isImageChanged = true;
+                            if (oldImage.Length != newImage.Length) imageChanged = true;
                         }
 
-                        // Если есть изменения - проверяем активные бронирования
-                        if (isDataChanged || isImageChanged)
+                        // Если фото изменилось или есть другие изменения - сохраняем
+                        if (imageChanged || row.RowState == DataRowState.Modified)
                         {
-                            // Проверка активных бронирований (ТОЛЬКО если меняются данные)
-                            if (isDataChanged)  // Проверяем только если меняются название/вместимость/описание
-                            {
-                                string checkQuery = "SELECT COUNT(*) FROM [Booking] WHERE [ConferenceRoomId] = @RoomId AND [StatusId] = 1";
-                                SqlCommand checkCmd = new SqlCommand(checkQuery, connection);
-                                checkCmd.Parameters.AddWithValue("@RoomId", roomId);
-                                int activeBookings = (int)checkCmd.ExecuteScalar();
-
-                                if (activeBookings > 0)
-                                {
-                                    MessageBox.Show($"Невозможно изменить данные зала «{roomName}».\n" +
-                                                    $"У зала есть {activeBookings} активных бронирований.\n" +
-                                                    "Сначала завершите или отмените все активные бронирования.",
-                                                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                                    return;
-                                }
-                            }
-
-                            // Сохраняем изменения
                             string update = @"UPDATE [ConferenceRooms]
                                       SET [Name] = @Name, [Capacity] = @Capacity,
                                           [description] = @Description, [image] = @Image
                                       WHERE [Id] = @Id";
                             SqlCommand cmd = new SqlCommand(update, connection);
                             cmd.Parameters.AddWithValue("@Id", roomId);
-                            cmd.Parameters.AddWithValue("@Name", newName);
-                            cmd.Parameters.AddWithValue("@Capacity", newCapacity);
+                            cmd.Parameters.AddWithValue("@Name", row["Name"].ToString().Trim());
+                            cmd.Parameters.AddWithValue("@Capacity", Convert.ToInt32(row["Capacity"]));
 
-                            if (string.IsNullOrWhiteSpace(newDescription))
+                            if (string.IsNullOrWhiteSpace(row["description"].ToString()))
                                 cmd.Parameters.AddWithValue("@Description", DBNull.Value);
                             else
-                                cmd.Parameters.AddWithValue("@Description", newDescription);
+                                cmd.Parameters.AddWithValue("@Description", row["description"].ToString().Trim());
 
                             if (newImage == null || newImage.Length == 0)
                             {
@@ -446,26 +407,15 @@ namespace BookingConferenceRoomss
                             }
 
                             cmd.ExecuteNonQuery();
+
+                            // Помечаем строку как не измененную
+                            row.AcceptChanges();
                         }
                     }
                     else if (row.RowState == DataRowState.Deleted)
                     {
                         // Удаление зала
                         int roomId = Convert.ToInt32(row["Id", DataRowVersion.Original]);
-
-                        string checkQuery = "SELECT COUNT(*) FROM [Booking] WHERE [ConferenceRoomId] = @RoomId AND [StatusId] = 1";
-                        SqlCommand checkCmd = new SqlCommand(checkQuery, connection);
-                        checkCmd.Parameters.AddWithValue("@RoomId", roomId);
-                        int activeBookings = (int)checkCmd.ExecuteScalar();
-
-                        if (activeBookings > 0)
-                        {
-                            MessageBox.Show($"Невозможно удалить зал.\n" +
-                                            $"У зала есть {activeBookings} активных бронирований.\n" +
-                                            "Сначала завершите или отмените все активные бронирования.",
-                                            "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            return;
-                        }
 
                         string deleteBookings = "DELETE FROM [Booking] WHERE [ConferenceRoomId] = @Id";
                         SqlCommand cmd = new SqlCommand(deleteBookings, connection);
@@ -483,7 +433,7 @@ namespace BookingConferenceRoomss
             roomsTable.AcceptChanges();
             MessageBox.Show("Все изменения сохранены!", "Успех",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
-            LoadRooms(); // Перезагружаем таблицу
+            LoadRooms();
         }
 
         private void deleteroom_bt_Click(object sender, EventArgs e)
